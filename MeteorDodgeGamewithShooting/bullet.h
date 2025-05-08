@@ -1,1 +1,5 @@
 #pragma once
+#define MAX_BULLETS 50
+#define BULLET_SPEED 8
+#define BULLET_RADIUS 4
+#define SHOOT_COOLDOWN_FRAMES 12
