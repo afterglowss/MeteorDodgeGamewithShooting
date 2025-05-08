@@ -1,1 +1,7 @@
 #pragma once
+#define PLAYER_SIZE 20
+#define PLAYER_ACCEL 0.5f
+#define PLAYER_FRICTION 0.9f
+#define TRAIL_LENGTH 20
+#define ROTATE_LERP_FACTOR 0.15f
+#define INVINCIBLE_TIME 120
