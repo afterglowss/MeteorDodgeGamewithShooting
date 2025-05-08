@@ -133,7 +133,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bullet.c" />
+    <ClCompile Include="game.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="meteor.c" />
+    <ClCompile Include="player.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bullet.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="meteor.h" />
+    <ClInclude Include="player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
