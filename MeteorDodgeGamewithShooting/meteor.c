@@ -40,6 +40,9 @@ static Meteor CreateRandomMeteor(int index) {
     Vector2 target = (Vector2){ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f };
     Vector2 direction = Vector2Normalize((Vector2) { target.x - m.position.x, target.y - m.position.y });
 
+    //속도-17
+    float speed = 5;
+    m.velocity = (Vector2){ direction.x * speed, direction.y * speed };
 
     return m;
 }
@@ -52,6 +55,19 @@ void InitMeteors() {
     }
 }
 
+//운석 위치 업데이트-17
+void UpdateMeteors() {
+    for (int i = 0; i < MAX_METEORS; i++) {
+        meteors[i].position.x += meteors[i].velocity.x;
+        meteors[i].position.y += meteors[i].velocity.y;
+
+        // 화면을 벗어나면 다시 생성
+        if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
+            meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
+            meteors[i] = CreateRandomMeteor(i);
+        }
+    }
+}
 
 // 운석 그리기
 void DrawMeteors() {
