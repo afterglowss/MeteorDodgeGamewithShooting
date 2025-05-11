@@ -36,11 +36,14 @@ static Meteor CreateRandomMeteor(int index) {
         break;
     }
 
-    // 화면 중심 향하는 방향
-    Vector2 target = (Vector2){ SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f };
-    Vector2 direction = Vector2Normalize((Vector2) { target.x - m.position.x, target.y - m.position.y });
+    //화면 외부에서 내부로 랜덤한 방향
+    float angle = ((float)(rand() % 360)) * DEG2RAD;
+    Vector2 direction = (Vector2){
+        cosf(angle),
+        sinf(angle)
+    };
 
-    //속도-17
+    // 속도
     float speed = 5;
     m.velocity = (Vector2){ direction.x * speed, direction.y * speed };
 
