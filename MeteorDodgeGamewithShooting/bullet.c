@@ -27,7 +27,22 @@ void FireBullet() {
 }
 
 //총알 위치 업데이트
-void UpdateBullets() {}
+void UpdateBullets() {
+	if (shootCooldown > 0) shootCooldown--;
+
+	for (int i = 0; i < MAX_BULLETS; i++) {
+		if (bullets[i].active) {
+			bullets[i].position.x += bullets[i].velocity.x;
+			bullets[i].position.y += bullets[i].velocity.y;
+
+			//화면 밖으로 나가면 삭제
+			if (bullets[i].position.x < 0 || bullets[i].position.x > GetScreenWidth()
+				|| bullets[i].position.y < 0 || bullets[i].position.y > GetScreenHeight()) {
+				bullets[i].active = false;
+			}
+		}
+	}
+}
 
 //총알 그리기
 void DrawBullets() {
