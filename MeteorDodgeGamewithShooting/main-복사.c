@@ -6,7 +6,7 @@
 
 int main(void)
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Raylib!");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Meteor Dodge Game With Shooting");
     SetTargetFPS(60);
 
     Player player;
