@@ -94,14 +94,31 @@ int main(void)
         }
         // 게임은 시작이 됐고, game over 는 아닐 경우
         if (!gameOver) {
-            // update 함수들이 들어갈 예정
-            // 총알 발사도 이쪽에서 구현
-            // 게임 오버 후 엔터 입력하면 재시작
+            // 반복문 안에서 Update 함수 계속 호출
+            UpdatePlayer(&player);
+            UpdateBullets();
+            UpdateMeteors();
+
+            if (IsKeyDown(KEY_SPACE)) {
+                FireBullet();
+            }
+            if (IsKeyPressed(KEY_A)) {
+                gameOver = true;
+            }
+
+        }
+        // gameStarted = true, gameOver = true 게임오버 화면 상태에서 엔터키로 바로 재시작
+        else if (IsKeyPressed(KEY_ENTER)) {
+            InitPlayer(&player);
+            InitMeteors();
+            // 총알 전부 비활성화
+            for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+            gameOver = false;
         }
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawPlayer();
+        DrawPlayer(player);
         DrawMeteors();
         DrawBullets();
         DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems, menuCount);
