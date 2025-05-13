@@ -5,11 +5,9 @@ static Color meteorColors[MAX_METEORS];
 #define minBright 100
 
 // 무작위 운석 생성 함수
-static Meteor CreateRandomMeteor(int index) {
-    Meteor m;
-
-    // 반지름: 10~40
-    m.radius = (float)(rand() % 31 + 10);
+static void RepawnMeteor(int index) {
+    float radius = (float)(rand() % 31 + 10);
+    meteors[index].radius = radius;
 
     // 무작위 색상 저장(밝게)
     meteorColors[index] = (Color){
@@ -23,18 +21,19 @@ static Meteor CreateRandomMeteor(int index) {
     int edge = rand() % 4;
     switch (edge) {
     case 0: // Top
-        m.position = (Vector2){ rand() % SCREEN_WIDTH, -m.radius };
+        meteors[index].position = (Vector2){ rand() % SCREEN_WIDTH, -radius };
         break;
     case 1: // Bottom
-        m.position = (Vector2){ rand() % SCREEN_WIDTH, SCREEN_HEIGHT + m.radius };
+        meteors[index].position = (Vector2){ rand() % SCREEN_WIDTH, SCREEN_HEIGHT + radius };
         break;
     case 2: // Left
-        m.position = (Vector2){ -m.radius, rand() % SCREEN_HEIGHT };
+        meteors[index].position = (Vector2){ -radius, rand() % SCREEN_HEIGHT };
         break;
     case 3: // Right
-        m.position = (Vector2){ SCREEN_WIDTH + m.radius, rand() % SCREEN_HEIGHT };
+        meteors[index].position = (Vector2){ SCREEN_WIDTH + radius, rand() % SCREEN_HEIGHT };
         break;
     }
+
 
     //화면 외부에서 내부로 랜덤한 방향
     float angle = ((float)(rand() % 360)) * DEG2RAD;
@@ -43,18 +42,17 @@ static Meteor CreateRandomMeteor(int index) {
         sinf(angle)
     };
 
-    // 속도
+    //속도
     float speed = 5;
-    m.velocity = (Vector2){ direction.x * speed, direction.y * speed };
-
-    return m;
+    meteors[index].velocity = (Vector2){direction.x * speed, direction.y * speed};
 }
+
 
 // 운석 초기화
 void InitMeteors() {
     srand((unsigned int)time(NULL));
     for (int i = 0; i < MAX_METEORS; i++) {
-        meteors[i] = CreateRandomMeteor(i);
+        RepawnMeteor(i);
     }
 }
 
@@ -64,10 +62,9 @@ void UpdateMeteors() {
         meteors[i].position.x += meteors[i].velocity.x;
         meteors[i].position.y += meteors[i].velocity.y;
 
-        // 화면을 벗어나면 다시 생성
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
-            meteors[i] = CreateRandomMeteor(i);
+            RepawnMeteor(i);  // 기존 meteor 재사용
         }
     }
 }
