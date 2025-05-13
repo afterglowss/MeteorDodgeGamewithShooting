@@ -62,8 +62,8 @@ int main(void)
                         BeginDrawing();
                         ClearBackground(BLACK);
                         // 최고점수 보여주기
-                        DrawText(TextFormat("High Score: %d", highScore), 280, 260, 30, YELLOW);
-                        DrawText("Press ENTER to return", 230, 320, 20, LIGHTGRAY);
+                        DrawText(TextFormat("High Score: %d", highScore), 450, 360, 30, YELLOW);
+                        DrawText("Press ENTER to return", 430, 420, 20, LIGHTGRAY);
                         EndDrawing();
                         // 엔터 치면 이전 메뉴로 돌아가기
                         if (IsKeyPressed(KEY_ENTER)) break;
@@ -74,12 +74,12 @@ int main(void)
                     while (!WindowShouldClose()) {
                         BeginDrawing();
                         ClearBackground(BLACK);
-                        DrawText("Created by Team", 230, 200, 30, YELLOW);
-                        DrawText("22011848 Shin Hyewon", 260, 250, 20, WHITE);
-                        DrawText("21011777 Im Wookyun", 260, 270, 20, WHITE);
-                        DrawText("22011796 Woo Jiwon", 260, 290, 20, WHITE);
-                        DrawText("22011813 Cha Seoyeung", 260, 310, 20, WHITE);
-                        DrawText("Press ENTER to return", 260, 400, 20, LIGHTGRAY);
+                        DrawText("Created by Team", 430, 300, 30, YELLOW);
+                        DrawText("22011848 Shin Hyewon", 430, 350, 20, WHITE);
+                        DrawText("21011777 Im Wookyun", 430, 370, 20, WHITE);
+                        DrawText("22011796 Woo Jiwon", 430, 390, 20, WHITE);
+                        DrawText("22011813 Cha Seoyeung", 430, 410, 20, WHITE);
+                        DrawText("Press ENTER to return", 430, 460, 20, LIGHTGRAY);
                         EndDrawing();
                         if (IsKeyPressed(KEY_ENTER)) break;
                     }
