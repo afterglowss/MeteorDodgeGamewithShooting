@@ -10,24 +10,37 @@ void InitPlayer(Player* playerRef) {
     playerRef->angle = 0.0f;
 }
 
-
 void DrawPlayer(Player* playerRef) {
+    float rad = playerRef->angle * (PI / 180.0f);
+
+    // 플레이어가 바라보는 위치
+    Vector2 head;
+    head.x = playerRef->position.x + PLAYER_SIZE * cos(rad);
+    head.y = playerRef->position.y + PLAYER_SIZE * sin(rad);
+
+    // -90도 방향 (왼쪽)
+    float leftRad = (playerRef->angle - 90.0f) * (PI / 180.0f);
+    Vector2 left;
+    left.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(leftRad);
+    left.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(leftRad);
+
+    // +90도 방향 (오른쪽)
+    float rightRad = (playerRef->angle + 90.0f) * (PI / 180.0f);
+    Vector2 right;
+    right.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(rightRad);
+    right.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(rightRad);
 
     // 플레이어 본체
     DrawCircleV(playerRef->position, 5.0f, RED);
 
+    // 참고용 시각화 (선택 사항)
+    DrawTriangle(head, left, right, RED);
 }
-
-
-
-#define DEG2RAD (PI / 180.0f)
-#define TURN_SPEED 400.0f // degree/sec
-#define MAX_SPEED 0.1f
 
 void UpdatePlayer(Player* playerRef) {
     float deltaTime = GetFrameTime();
 
-    
+
     float rad = (PI / 180.0f);
     float turnspeed = 360.0;
     float maxspeed = 0.1f;
