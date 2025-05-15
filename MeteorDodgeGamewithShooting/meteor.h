@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "game.h"
+#include "player.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -13,6 +14,6 @@ typedef struct Meteor {
 	float radius;
 }Meteor;
 
-void InitMeteors();
-void UpdateMeteors();
-void DrawMeteors();
+void InitMeteors(Meteor *meteors);
+void UpdateMeteors(Meteor* meteors, Player* playerRef);
+void DrawMeteors(Meteor* meteors);
