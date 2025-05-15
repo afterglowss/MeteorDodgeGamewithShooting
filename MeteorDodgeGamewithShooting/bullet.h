@@ -12,6 +12,6 @@ typedef struct Bullet {
 	bool active;
 } Bullet;
 
-void FireBullet();
-void UpdateBullets();
-void DrawBullets();
+void FireBullet(Bullet* bullets);
+void UpdateBullets(Bullet* bullets);
+void DrawBullets(Bullet* bullets);
