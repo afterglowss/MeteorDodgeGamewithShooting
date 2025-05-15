@@ -2,11 +2,11 @@
 #include "bullet.h"
 #include "raylib.h"
 
-static Bullet bullets[MAX_BULLETS];
+
 static int shootCooldown = 0;
 
 //총알 생성, 그냥 정해진 어느 위치에서 생성되게
-void FireBullet() {
+void FireBullet(Bullet *bullets) {
 	if (shootCooldown > 0) return;
 
 	for (int i = 0; i < MAX_BULLETS; i++) {
@@ -27,7 +27,7 @@ void FireBullet() {
 }
 
 //총알 위치 업데이트
-void UpdateBullets() {
+void UpdateBullets(Bullet* bullets) {
 	if (shootCooldown > 0) shootCooldown--;
 
 	for (int i = 0; i < MAX_BULLETS; i++) {
@@ -45,7 +45,7 @@ void UpdateBullets() {
 }
 
 //총알 그리기
-void DrawBullets() {
+void DrawBullets(Bullet* bullets) {
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (bullets[i].active) {
 			DrawCircleV(bullets[i].position, BULLET_RADIUS, RED);
