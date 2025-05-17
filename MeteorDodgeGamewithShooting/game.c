@@ -1,6 +1,44 @@
 #include "game.h"
 #include "player.h"
 
+Particle particles[MAX_PARTICLES] = { 0 };
+
+Vector2 RandomDirection() {
+    float angle = (float)(rand() % 360) * PI / 180.0f;
+    return (Vector2) { cosf(angle), sinf(angle) };
+}
+
+void GenerateExplosion(Vector2 position, Color color) {
+    for (int i = 0, spawned = 0; i < MAX_PARTICLES && spawned < PARTICLE_PER_EXPLOSION; i++) {
+        if (!particles[i].active) {
+            particles[i].position = position;
+            particles[i].velocity = Vector2Scale(RandomDirection(), 2 + rand() % 3);
+            particles[i].lifetime = PARTICLE_LIFETIME;
+            particles[i].active = true;
+            particles[i].color = color;
+            spawned++;
+        }
+    }
+}
+
+void UpdateParticles() {
+    for (int i = 0; i < MAX_PARTICLES; i++) {
+        if (particles[i].active) {
+            particles[i].position = Vector2Add(particles[i].position, particles[i].velocity);
+            if (--particles[i].lifetime <= 0) particles[i].active = false;
+        }
+    }
+}
+
+void DrawParticles() {
+    for (int i = 0; i < MAX_PARTICLES; i++) {
+        if (particles[i].active) {
+            float alpha = (float)particles[i].lifetime / PARTICLE_LIFETIME;
+            DrawCircleV(particles[i].position, 2.5f, Fade(particles[i].color, alpha));
+        }
+    }
+}
+
 void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, const char** menuItems, int menuCount) {
     if (!gameStarted) {
         DrawText("Meteor Dodge Game", 405, 200, 40, WHITE);

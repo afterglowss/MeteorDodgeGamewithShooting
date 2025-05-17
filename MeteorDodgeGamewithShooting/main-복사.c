@@ -13,7 +13,7 @@ int main(void)
     InitPlayer(&player);
 
     Meteor meteors[MAX_METEORS];
-    InitMeteors();
+    InitMeteors(meteors);
 
     Bullet bullets[MAX_BULLETS] = { 0 };
 
@@ -50,7 +50,7 @@ int main(void)
                     // 플레이어 초기화
                     InitPlayer(&player);
                     // 운석 초기화
-                    InitMeteors();
+                    InitMeteors(meteors);
                     // 총알 전부 비활성화
                     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
                     // 총알 쿨타임, 점수, 점수에 따른 운석 속도 초기화 (=0) 필요
@@ -96,11 +96,12 @@ int main(void)
         if (!gameOver) {
             // 반복문 안에서 Update 함수 계속 호출
             UpdatePlayer(&player);
-            UpdateBullets();
-            UpdateMeteors();
+            UpdateBullets(bullets);
+            UpdateMeteors(meteors, &player, bullets);
+            UpdateParticles();
 
             if (IsKeyDown(KEY_SPACE)) {
-                FireBullet();
+                FireBullet(bullets);
             }
             if (IsKeyPressed(KEY_A)) {
                 gameOver = true;
@@ -110,7 +111,7 @@ int main(void)
         // gameStarted = true, gameOver = true 게임오버 화면 상태에서 엔터키로 바로 재시작
         else if (IsKeyPressed(KEY_ENTER)) {
             InitPlayer(&player);
-            InitMeteors();
+            InitMeteors(meteors);
             // 총알 전부 비활성화
             for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
             gameOver = false;
@@ -118,9 +119,10 @@ int main(void)
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawPlayer(player);
-        DrawMeteors();
-        DrawBullets();
+        DrawPlayer(&player);
+        DrawMeteors(meteors);
+        DrawBullets(bullets);
+        DrawParticles();
         DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems, menuCount);
         EndDrawing();
     }
