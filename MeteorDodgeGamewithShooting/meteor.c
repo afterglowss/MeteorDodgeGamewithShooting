@@ -3,15 +3,12 @@
 #include "game.h"
 
 
-static Color meteorColors[MAX_METEORS];
-#define minBright 100
-
 // 무작위 운석 생성 함수
 static void RespawnMeteor(Meteor* m, int index) {
     m->radius = (float)(rand() % 31 + 10);
 
     // 무작위 색상 저장(밝게)
-    meteorColors[index] = (Color){
+    m->color = (Color){
     minBright + rand() % (256 - minBright),
     minBright + rand() % (256 - minBright),
     minBright + rand() % (256 - minBright),
@@ -76,7 +73,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
         for (int j = 0; j < MAX_METEORS; j++) {
             if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
                 meteors[j].position, meteors[j].radius)) {
-                GenerateExplosion(meteors[j].position, GRAY);
+                GenerateExplosion(meteors[j].position, meteors[j].color);
                 bullets[i].active = false;
                 RespawnMeteor(&meteors[j], j);
                 break;
@@ -106,6 +103,6 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
 // 운석 그리기
 void DrawMeteors(Meteor* meteors) {
     for (int i = 0; i < MAX_METEORS; i++) {
-        DrawCircleV(meteors[i].position, meteors[i].radius, meteorColors[i]);
+        DrawCircleV(meteors[i].position, meteors[i].radius, meteors[i].color);
     }
 }

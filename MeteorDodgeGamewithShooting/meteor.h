@@ -8,10 +8,12 @@
 #include <time.h>
 
 #define MAX_METEORS 40
+#define minBright 100
 
 typedef struct Meteor {
 	Vector2 position;
 	Vector2 velocity;
+	Color color;
 	float radius;
 }Meteor;
 
