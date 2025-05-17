@@ -14,6 +14,6 @@ typedef struct Meteor {
 	float radius;
 }Meteor;
 
-void InitMeteors(Meteor *meteors);
+void InitMeteors(Meteor* meteors);
 void UpdateMeteors(Meteor* meteors, Player* playerRef);
 void DrawMeteors(Meteor* meteors);
