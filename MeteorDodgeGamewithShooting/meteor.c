@@ -72,8 +72,8 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
         if (!bullets[i].active) continue;
 
         for (int j = 0; j < MAX_METEORS; j++) {
-            float dist = Vector2Distance(bullets[i].position, meteors[j].position);
-            if (dist < meteors[j].radius + BULLET_RADIUS) {
+            if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
+                meteors[j].position, meteors[j].radius)) {
                 bullets[i].active = false;
                 RespawnMeteor(&meteors[j], j);
                 break;
@@ -90,8 +90,8 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
 
     //운석-플레이어 충돌 처리: 19
     for (int i = 0; i < MAX_METEORS; i++) {
-        float dist = Vector2Distance(playerRef->position, meteors[i].position);
-        if (dist < meteors[i].radius + PLAYER_SIZE / 2.0f) {
+        if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
+            meteors[i].position, meteors[i].radius)) {
             playerCollision(playerRef);
             playerRef->lives--;
             break;
