@@ -1,13 +1,12 @@
 #include "meteor.h"
 
-static Meteor meteors[MAX_METEORS];
+
 static Color meteorColors[MAX_METEORS];
 #define minBright 100
 
 // 무작위 운석 생성 함수
-static void RepawnMeteor(int index) {
-    float radius = (float)(rand() % 31 + 10);
-    meteors[index].radius = radius;
+static void RespawnMeteor(Meteor* m, int index) {
+    m->radius = (float)(rand() % 31 + 10);
 
     // 무작위 색상 저장(밝게)
     meteorColors[index] = (Color){
@@ -20,17 +19,17 @@ static void RepawnMeteor(int index) {
     // 화면 밖 랜덤한 위치
     int edge = rand() % 4;
     switch (edge) {
-    case 0: // Top
-        meteors[index].position = (Vector2){ rand() % SCREEN_WIDTH, -radius };
+    case 0: // TOP
+        m->position = (Vector2){ rand() % SCREEN_WIDTH, -m->radius };
         break;
-    case 1: // Bottom
-        meteors[index].position = (Vector2){ rand() % SCREEN_WIDTH, SCREEN_HEIGHT + radius };
+    case 1: // BOTTOM
+        m->position = (Vector2){ rand() % SCREEN_WIDTH, SCREEN_HEIGHT + m->radius };
         break;
-    case 2: // Left
-        meteors[index].position = (Vector2){ -radius, rand() % SCREEN_HEIGHT };
+    case 2: // LEFT
+        m->position = (Vector2){ -m->radius, rand() % SCREEN_HEIGHT };
         break;
-    case 3: // Right
-        meteors[index].position = (Vector2){ SCREEN_WIDTH + radius, rand() % SCREEN_HEIGHT };
+    case 3: // RIGHT
+        m->position = (Vector2){ SCREEN_WIDTH + m->radius, rand() % SCREEN_HEIGHT };
         break;
     }
 
@@ -43,34 +42,51 @@ static void RepawnMeteor(int index) {
     };
 
     //속도
-    float speed = 5;
-    meteors[index].velocity = (Vector2){direction.x * speed, direction.y * speed};
+    float speed = 3;
+    m->velocity = (Vector2){ direction.x * speed, direction.y * speed };
 }
 
 
 // 운석 초기화
-void InitMeteors() {
+void InitMeteors(Meteor* meteors) {
     srand((unsigned int)time(NULL));
     for (int i = 0; i < MAX_METEORS; i++) {
-        RepawnMeteor(i);
+        RespawnMeteor(&meteors[i], i);
     }
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors() {
+void UpdateMeteors(Meteor* meteors, Player* playerRef) {
     for (int i = 0; i < MAX_METEORS; i++) {
         meteors[i].position.x += meteors[i].velocity.x;
         meteors[i].position.y += meteors[i].velocity.y;
 
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
-            RepawnMeteor(i);  // 기존 meteor 재사용
+            RespawnMeteor(&meteors[i], i);  // 삭제된 meteor 재사용
+        }
+    }
+
+    // 무적 상태일 경우 충돌 검사 무시
+    if (playerRef->isCollision) {
+        double diffTime = GetTime() - playerRef->deathTime;
+        if (diffTime < 2.0) return;  // 아직 무적 상태면 충돌 검사 건너뜀
+        else playerRef->isCollision = false;  // 무적 시간 끝났으면 초기화
+    }
+
+    //운석-플레이어 충돌 처리: 19
+    for (int i = 0; i < MAX_METEORS; i++) {
+        float dist = Vector2Distance(playerRef->position, meteors[i].position);
+        if (dist < meteors[i].radius + PLAYER_SIZE / 2.0f) {
+            playerCollision(playerRef);
+            playerRef->lives--;
+            break;
         }
     }
 }
 
 // 운석 그리기
-void DrawMeteors() {
+void DrawMeteors(Meteor* meteors) {
     for (int i = 0; i < MAX_METEORS; i++) {
         DrawCircleV(meteors[i].position, meteors[i].radius, meteorColors[i]);
     }
