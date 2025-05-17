@@ -56,7 +56,7 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
     for (int i = 0; i < MAX_METEORS; i++) {
         meteors[i].position.x += meteors[i].velocity.x;
         meteors[i].position.y += meteors[i].velocity.y;
@@ -64,6 +64,20 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef) {
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
             RespawnMeteor(&meteors[i], i);  // 삭제된 meteor 재사용
+        }
+    }
+
+    //운석-총알 충돌 처리: 20
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (!bullets[i].active) continue;
+
+        for (int j = 0; j < MAX_METEORS; j++) {
+            float dist = Vector2Distance(bullets[i].position, meteors[j].position);
+            if (dist < meteors[j].radius + BULLET_RADIUS) {
+                bullets[i].active = false;
+                RespawnMeteor(&meteors[j], j);
+                break;
+            }
         }
     }
 
