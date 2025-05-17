@@ -67,6 +67,20 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
         }
     }
 
+    //款籍-醚舅 面倒 贸府: 20
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (!bullets[i].active) continue;
+
+        for (int j = 0; j < MAX_METEORS; j++) {
+            float dist = Vector2Distance(bullets[i].position, meteors[j].position);
+            if (dist < meteors[j].radius + BULLET_RADIUS) {
+                bullets[i].active = false;
+                RespawnMeteor(&meteors[j], j);
+                break;
+            }
+        }
+    }
+
     // 公利 惑怕老 版快 面倒 八荤 公矫
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
@@ -81,20 +95,6 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
             playerCollision(playerRef);
             playerRef->lives--;
             break;
-        }
-    }
-
-    //款籍-醚舅 面倒 贸府: 20
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (!bullets[i].active) continue;
-
-        for (int j = 0; j < MAX_METEORS; j++) {
-            float dist = Vector2Distance(bullets[i].position, meteors[j].position);
-            if (dist < meteors[j].radius + BULLET_RADIUS) {
-                bullets[i].active = false;
-                RespawnMeteor(&meteors[j], j);
-                break;
-            }
         }
     }
 }
