@@ -1,4 +1,6 @@
+#pragma once
 #include "meteor.h"
+#include "game.h"
 
 
 static Color meteorColors[MAX_METEORS];
@@ -74,6 +76,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
         for (int j = 0; j < MAX_METEORS; j++) {
             if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
                 meteors[j].position, meteors[j].radius)) {
+                GenerateExplosion(meteors[j].position, GRAY);
                 bullets[i].active = false;
                 RespawnMeteor(&meteors[j], j);
                 break;
@@ -92,6 +95,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
     for (int i = 0; i < MAX_METEORS; i++) {
         if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
             meteors[i].position, meteors[i].radius)) {
+            GenerateExplosion(playerRef->position, RED);
             playerCollision(playerRef);
             playerRef->lives--;
             break;
