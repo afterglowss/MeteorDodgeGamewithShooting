@@ -53,6 +53,8 @@ int main(void)
                     InitMeteors(meteors);
                     // 총알 전부 비활성화
                     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+                    // 충돌 파티클 비활성화
+                    for (int i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
                     // 총알 쿨타임, 점수, 점수에 따른 운석 속도 초기화 (=0) 필요
                     score = 0;
                     gameOver = false;
@@ -98,7 +100,7 @@ int main(void)
             // 반복문 안에서 Update 함수 계속 호출
             UpdatePlayer(&player);
             UpdateBullets(bullets);
-            UpdateMeteors(meteors, &player, bullets, &score);
+            UpdateMeteors(meteors, &player, bullets, &score, &gameOver);
             UpdateParticles();
 
             if (IsKeyDown(KEY_SPACE)) {
@@ -115,6 +117,8 @@ int main(void)
             InitMeteors(meteors);
             // 총알 전부 비활성화
             for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+            // 충돌 파티클 비활성화
+            for (int i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
             // score 초기화
             score = 0;
             gameOver = false;
