@@ -2,6 +2,7 @@
 #include "meteor.h"
 #include "game.h"
 
+int highScore = 0;
 
 // 무작위 운석 생성 함수
 static void RespawnMeteor(Meteor* m, int index) {
@@ -55,7 +56,7 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score) {
     for (int i = 0; i < MAX_METEORS; i++) {
         meteors[i].position.x += meteors[i].velocity.x;
         meteors[i].position.y += meteors[i].velocity.y;
@@ -75,6 +76,10 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets) {
                 meteors[j].position, meteors[j].radius)) {
                 GenerateExplosion(meteors[j].position, meteors[j].color);
                 bullets[i].active = false;
+                // 총알과 운석이 충돌했을 경우 점수 100점 추가
+                *score += 100;
+                // 최고 점수보다 현재 점수가 높을 경우 최고 점수 갱신
+                if (*score > highScore) highScore = *score;
                 RespawnMeteor(&meteors[j], j);
                 break;
             }

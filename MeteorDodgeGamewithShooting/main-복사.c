@@ -24,7 +24,7 @@ int main(void)
     const int menuCount = 4;
 
     int score = 0;
-    int highScore = 0;  // 전역변수로 관리 필요, meteor.c에서부터 정의를 넣는 게 좋을듯
+    //int highScore = 0;  // 전역변수로 관리 필요, meteor.c에서부터 정의를 넣는 게 좋을듯
 
     while (!WindowShouldClose())
     {
@@ -54,6 +54,7 @@ int main(void)
                     // 총알 전부 비활성화
                     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
                     // 총알 쿨타임, 점수, 점수에 따른 운석 속도 초기화 (=0) 필요
+                    score = 0;
                     gameOver = false;
                 }
                 // Score 버튼 엔터
@@ -97,11 +98,11 @@ int main(void)
             // 반복문 안에서 Update 함수 계속 호출
             UpdatePlayer(&player);
             UpdateBullets(bullets);
-            UpdateMeteors(meteors, &player, bullets);
+            UpdateMeteors(meteors, &player, bullets, &score);
             UpdateParticles();
 
             if (IsKeyDown(KEY_SPACE)) {
-                FireBullet(bullets);
+                FireBullet(bullets, &player);
             }
             if (IsKeyPressed(KEY_A)) {
                 gameOver = true;
@@ -114,6 +115,8 @@ int main(void)
             InitMeteors(meteors);
             // 총알 전부 비활성화
             for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+            // score 초기화
+            score = 0;
             gameOver = false;
         }
 
