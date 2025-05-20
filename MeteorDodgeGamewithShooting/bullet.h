@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include "raylib.h"
+#include "player.h"
 
 #define MAX_BULLETS 50
-#define BULLET_SPEED 1
+#define BULLET_SPEED 10
 #define BULLET_RADIUS 4
 #define SHOOT_COOLDOWN_FRAMES 12
 
@@ -12,6 +13,6 @@ typedef struct Bullet {
 	bool active;
 } Bullet;
 
-void FireBullet(Bullet* bullets);
+void FireBullet(Bullet* bullets, Player* playerRef);
 void UpdateBullets(Bullet* bullets);
 void DrawBullets(Bullet* bullets);
