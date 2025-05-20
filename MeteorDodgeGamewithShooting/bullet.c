@@ -5,19 +5,27 @@
 
 static int shootCooldown = 0;
 
-//총알 생성, 그냥 정해진 어느 위치에서 생성되게
-void FireBullet(Bullet *bullets) {
+//총알 생성, player의 head에서 생성되게
+void FireBullet(Bullet *bullets, Player* playerRef) {
 	if (shootCooldown > 0) return;
 
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (!bullets[i].active) {
 			bullets[i].active = true;
 
-			//중앙에서 생성, 추후 플레이어 위치에서 생성
-			bullets[i].position = (Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+			float rad = playerRef->angle * (PI / 180.0f);
 
-			//고정 방향, 추후 플레이어 방향으로 생성
-			Vector2 direction = { 1,0 };
+			//플레이어 head 위치에서 생성
+			bullets[i].position = (Vector2){
+				playerRef->position.x + PLAYER_SIZE * cos(rad),
+				playerRef->position.y + PLAYER_SIZE * sin(rad)
+			};
+
+			//플레이어 방향으로 생성
+			Vector2 direction = (Vector2){
+				cosf(rad),
+				sinf(rad)
+			};
 			bullets[i].velocity = (Vector2){ direction.x * BULLET_SPEED, direction.y * BULLET_SPEED };
 
 			shootCooldown = SHOOT_COOLDOWN_FRAMES;
@@ -48,7 +56,7 @@ void UpdateBullets(Bullet* bullets) {
 void DrawBullets(Bullet* bullets) {
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (bullets[i].active) {
-			DrawCircleV(bullets[i].position, BULLET_RADIUS, RED);
+			DrawCircleV(bullets[i].position, BULLET_RADIUS, YELLOW);
 		}
 	}
 }
