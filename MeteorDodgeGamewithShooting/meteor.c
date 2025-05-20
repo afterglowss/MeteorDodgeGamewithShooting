@@ -56,7 +56,7 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver) {
     for (int i = 0; i < MAX_METEORS; i++) {
         meteors[i].position.x += meteors[i].velocity.x;
         meteors[i].position.y += meteors[i].velocity.y;
@@ -100,6 +100,8 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
             GenerateExplosion(playerRef->position, RED);
             playerCollision(playerRef);
             playerRef->lives--;
+            // lives <= 0 이면 게임 오버
+            if (playerRef->lives <= 0) *gameOver = true;
             break;
         }
     }

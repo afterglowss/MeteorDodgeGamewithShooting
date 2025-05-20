@@ -20,5 +20,5 @@ typedef struct Meteor {
 }Meteor;
 
 void InitMeteors(Meteor* meteors);
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score);
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver);
 void DrawMeteors(Meteor* meteors);
