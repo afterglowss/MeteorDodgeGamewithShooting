@@ -10,6 +10,8 @@
 #define MAX_METEORS 40
 #define minBright 100
 
+extern int highScore;
+
 typedef struct Meteor {
 	Vector2 position;
 	Vector2 velocity;
@@ -18,5 +20,5 @@ typedef struct Meteor {
 }Meteor;
 
 void InitMeteors(Meteor* meteors);
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets);
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score);
 void DrawMeteors(Meteor* meteors);
