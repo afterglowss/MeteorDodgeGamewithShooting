@@ -13,6 +13,8 @@
 struct Player
 {
 	Vector2 position;
+
+	Vector2 trail[TRAIL_LENGTH];
 	Vector2 velocity;
 	Vector2 head,left,right;
 	bool isCollision;
@@ -20,6 +22,7 @@ struct Player
 	float angle;
 	float size;
 	int lives;
+	int trailIdx;
 }typedef Player;
 
 void InitPlayer(Player *playerRef);
