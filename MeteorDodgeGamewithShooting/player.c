@@ -47,7 +47,7 @@ void DrawPlayer(Player* playerRef) {
         int idx = (playerRef->trailIdx + i) % TRAIL_LENGTH;
         float trace = (float)i / TRAIL_LENGTH;
         Color fade = (Color){ 255,0,0 ,(unsigned char)(trace * 100) };
-        DrawCircleV(playerRef->trail[idx], 3.0f, fade);
+        DrawCircleV(playerRef->trail[idx], 4.0f, fade);
     }
 
 
