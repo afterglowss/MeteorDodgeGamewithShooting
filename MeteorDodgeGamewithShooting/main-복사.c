@@ -106,11 +106,8 @@ int main(void)
             if (IsKeyDown(KEY_SPACE)) {
                 FireBullet(bullets, &player);
             }
-            if (IsKeyPressed(KEY_A)) {
-                gameOver = true;
-            }
-
         }
+
         // gameStarted = true, gameOver = true 게임오버 화면 상태에서 엔터키로 바로 재시작
         else if (IsKeyPressed(KEY_ENTER)) {
             InitPlayer(&player);
