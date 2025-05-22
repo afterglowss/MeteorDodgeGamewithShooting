@@ -78,9 +78,9 @@ int main(void)
                         ClearBackground(BLACK);
                         DrawText("Created by Team", 430, 300, 30, YELLOW);
                         DrawText("22011848 Shin Hyewon", 430, 350, 20, WHITE);
-                        DrawText("21011777 Im Wookyun", 430, 370, 20, WHITE);
+                        DrawText("21011777 Lim Woogyun", 430, 370, 20, WHITE);
                         DrawText("22011796 Woo Jiwon", 430, 390, 20, WHITE);
-                        DrawText("22011813 Cha Seoyeung", 430, 410, 20, WHITE);
+                        DrawText("22011813 Cha Seoyeong", 430, 410, 20, WHITE);
                         DrawText("Press ENTER to return", 430, 460, 20, LIGHTGRAY);
                         EndDrawing();
                         if (IsKeyPressed(KEY_ENTER)) break;
