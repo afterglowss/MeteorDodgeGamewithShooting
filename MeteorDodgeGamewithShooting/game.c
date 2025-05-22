@@ -1,5 +1,6 @@
 #include "game.h"
 #include "player.h"
+#include "meteor.h"
 
 Particle particles[MAX_PARTICLES] = { 0 };
 
@@ -54,7 +55,8 @@ void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selec
 
         if (gameOver) {
             DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.75f));
-            DrawText("GAME OVER", 460, 360, 40, RED);
+            DrawText("GAME OVER", 460, 330, 40, RED);
+            DrawText(TextFormat("HIGHSCORE: %d", highScore), 450, 375, 30, YELLOW);
             DrawText("Press ENTER to restart", 450, 410, 20, LIGHTGRAY);
             DrawText("Press BACKSPACE to Main", 445, 440, 20, LIGHTGRAY);
         }
