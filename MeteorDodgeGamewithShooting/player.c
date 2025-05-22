@@ -74,6 +74,39 @@ void DrawPlayer(Player* playerRef) {
     }
 }
 
+void ScreenRestrictPlayer(Player* playerRef) {
+    float rad = playerRef->angle * (PI / 180.0f);
+
+    Vector2 head = {
+        playerRef->position.x + PLAYER_SIZE * cosf(rad),
+        playerRef->position.y + PLAYER_SIZE * sinf(rad)
+    };
+
+    Vector2 left = {
+        playerRef->position.x + (PLAYER_SIZE / 2) * cosf(rad - PI / 2),
+        playerRef->position.y + (PLAYER_SIZE / 2) * sinf(rad - PI / 2)
+    };
+
+    Vector2 right = {
+        playerRef->position.x + (PLAYER_SIZE / 2) * cosf(rad + PI / 2),
+        playerRef->position.y + (PLAYER_SIZE / 2) * sinf(rad + PI / 2)
+    };
+
+    Vector2* points[] = { &head, &left, &right };
+
+    for (int i = 0; i < 3; i++) {
+        Vector2* p = points[i];
+
+        if (p->x < 0) playerRef->position.x += (0 - p->x);
+        else if (p->x > SCREEN_WIDTH) playerRef->position.x -= (p->x - SCREEN_WIDTH);
+
+        if (p->y < 0) playerRef->position.y += (0 - p->y);
+        else if (p->y > SCREEN_HEIGHT) playerRef->position.y -= (p->y - SCREEN_HEIGHT);
+    }
+}
+
+
+
 void UpdatePlayer(Player* playerRef) {
     float deltaTime = GetFrameTime();
     float rad = (PI / 180.0f);
@@ -130,4 +163,6 @@ void UpdatePlayer(Player* playerRef) {
     //트레일 위치 저장
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
+
+    ScreenRestrictPlayer(playerRef);
 }
