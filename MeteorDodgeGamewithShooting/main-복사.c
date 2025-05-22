@@ -24,7 +24,6 @@ int main(void)
     const int menuCount = 4;
 
     int score = 0;
-    //int highScore = 0;  // 전역변수로 관리 필요, meteor.c에서부터 정의를 넣는 게 좋을듯
 
     while (!WindowShouldClose())
     {
