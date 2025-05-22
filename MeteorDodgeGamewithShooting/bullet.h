@@ -4,7 +4,7 @@
 #include "player.h"
 
 #define MAX_BULLETS 50
-#define BULLET_SPEED 10
+#define BULLET_SPEED 15
 #define BULLET_RADIUS 4
 #define SHOOT_COOLDOWN_FRAMES 12
 
