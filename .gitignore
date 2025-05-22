@@ -27,7 +27,7 @@
 *.dylib
 
 # Executables
-*.exe
+# *.exe
 *.out
 *.app
 *.i*86
@@ -51,3 +51,12 @@ dkms.conf
 
 # .vs 무시
 .vs/
+
+# log 무시
+*.tlog
+*.log
+*.tlog/
+
+#debug 무시
+x64/
+Debug/
