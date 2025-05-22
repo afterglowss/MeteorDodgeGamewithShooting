@@ -1,3 +1,4 @@
+#pragma once
 #include <stdlib.h>
 #include "raylib.h"
 #include "player.h"
