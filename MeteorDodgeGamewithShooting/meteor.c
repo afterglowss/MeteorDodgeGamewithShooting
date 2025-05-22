@@ -3,6 +3,8 @@
 #include "game.h"
 
 int highScore = 0;
+int checkScore = 0;
+float speed;
 
 // 무작위 운석 생성 함수
 static void RespawnMeteor(Meteor* m, int index) {
@@ -42,7 +44,6 @@ static void RespawnMeteor(Meteor* m, int index) {
     };
 
     //속도
-    float speed = 3;
     m->velocity = (Vector2){ direction.x * speed, direction.y * speed };
 }
 
@@ -50,6 +51,7 @@ static void RespawnMeteor(Meteor* m, int index) {
 // 운석 초기화
 void InitMeteors(Meteor* meteors) {
     srand((unsigned int)time(NULL));
+    speed = 3;
     for (int i = 0; i < MAX_METEORS; i++) {
         RespawnMeteor(&meteors[i], i);
     }
@@ -78,6 +80,13 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
                 bullets[i].active = false;
                 // 총알과 운석이 충돌했을 경우 점수 100점 추가
                 *score += 100;
+                checkScore += 100;
+                //1000점 획득 할 때마다 속도 +0.5f
+                if (checkScore / 1000 == 1) 
+                {
+                    speed += 0.5f;
+                    checkScore = 0;
+                }
                 // 최고 점수보다 현재 점수가 높을 경우 최고 점수 갱신
                 if (*score > highScore) highScore = *score;
                 RespawnMeteor(&meteors[j], j);
@@ -86,7 +95,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
         }
     }
 
-    // 무적 상태일 경우 충돌 검사 무시
+    // 플레이어 무적 상태일 경우 충돌 검사 무시
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
         if (diffTime < 2.0) return;  // 아직 무적 상태면 충돌 검사 건너뜀
