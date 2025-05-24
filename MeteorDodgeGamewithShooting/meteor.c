@@ -111,17 +111,14 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
     //운석-플레이어 충돌 처리: 19
     for (int i = 0; i < MAX_METEORS; i++) {
 
-        if (!freezeActive) 
-        {
-            if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
-                meteors[i].position, meteors[i].radius)) {
-                GenerateExplosion(playerRef->position, RED);
-                playerCollision(playerRef);
-                playerRef->lives--;
-                // lives <= 0 이면 게임 오버
-                if (playerRef->lives <= 0) *gameOver = true;
-                break;
-            }
+        if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
+            meteors[i].position, meteors[i].radius)) {
+            GenerateExplosion(playerRef->position, RED);
+            playerCollision(playerRef);
+            playerRef->lives--;
+            // lives <= 0 이면 게임 오버
+            if (playerRef->lives <= 0) *gameOver = true;
+            break;
         }
     }
 }
