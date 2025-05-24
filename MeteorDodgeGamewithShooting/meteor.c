@@ -7,7 +7,7 @@ int checkScore = 0;
 float speed;
 
 // 무작위 운석 생성 함수
-static void RespawnMeteor(Meteor* m, int index) {
+void RespawnMeteor(Meteor* m, int index) {
     m->radius = (float)(rand() % 31 + 10);
 
     // 무작위 색상 저장(밝게)
@@ -58,10 +58,16 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, bool meteorFreeze, double freezeStartTime) {
+    double currentTime = GetTime();
+
+    bool freezeActive = meteorFreeze && (currentTime - freezeStartTime <= 3.0);
+    
     for (int i = 0; i < MAX_METEORS; i++) {
-        meteors[i].position.x += meteors[i].velocity.x;
-        meteors[i].position.y += meteors[i].velocity.y;
+        if (!freezeActive) {
+            meteors[i].position.x += meteors[i].velocity.x;
+            meteors[i].position.y += meteors[i].velocity.y;
+        }
 
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
@@ -104,14 +110,18 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
 
     //운석-플레이어 충돌 처리: 19
     for (int i = 0; i < MAX_METEORS; i++) {
-        if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
-            meteors[i].position, meteors[i].radius)) {
-            GenerateExplosion(playerRef->position, RED);
-            playerCollision(playerRef);
-            playerRef->lives--;
-            // lives <= 0 이면 게임 오버
-            if (playerRef->lives <= 0) *gameOver = true;
-            break;
+
+        if (!freezeActive) 
+        {
+            if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
+                meteors[i].position, meteors[i].radius)) {
+                GenerateExplosion(playerRef->position, RED);
+                playerCollision(playerRef);
+                playerRef->lives--;
+                // lives <= 0 이면 게임 오버
+                if (playerRef->lives <= 0) *gameOver = true;
+                break;
+            }
         }
     }
 }

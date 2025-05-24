@@ -30,7 +30,7 @@
     <ClCompile Include="game.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="main-복사.c">
+    <ClCompile Include="item.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -45,6 +45,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
