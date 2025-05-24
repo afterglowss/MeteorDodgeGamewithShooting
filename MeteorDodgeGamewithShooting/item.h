@@ -1,3 +1,4 @@
+#pragma once
 #include "raylib.h"
 #include "player.h"
 
@@ -7,11 +8,11 @@ typedef enum {
     LASER_GUN
 } ItemType;
 
-struct Item {
+typedef struct Item {
     Vector2 position;
     bool active;
     ItemType type;
-};
+} Item;
 
 void InitItem(Item* item);
 void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime);
