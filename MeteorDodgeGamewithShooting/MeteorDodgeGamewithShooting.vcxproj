@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="bullet.c" />
     <ClCompile Include="game.c" />
+    <ClCompile Include="item.c" />
     <ClCompile Include="main.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -145,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="bullet.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="meteor.h" />
     <ClInclude Include="player.h" />
   </ItemGroup>
