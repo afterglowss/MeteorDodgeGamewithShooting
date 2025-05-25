@@ -24,4 +24,5 @@ void GenerateExplosion(Vector2 position, Color color);
 
 Vector2 RandomDirection();
 
-void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, const char** menuItems, int menuCount);
+void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, 
+    const char** menuItems, int menuCount, Sound gameOverSound, bool *gameOverSoundPlayed);

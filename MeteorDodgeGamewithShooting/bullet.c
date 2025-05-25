@@ -6,9 +6,9 @@
 static int shootCooldown = 0;
 
 //총알 생성, player의 head에서 생성되게
-void FireBullet(Bullet *bullets, Player* playerRef) {
+void FireBullet(Bullet *bullets, Player* playerRef, Sound fire) {
 	if (shootCooldown > 0) return;
-
+	PlaySound(fire);
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (!bullets[i].active) {
 			bullets[i].active = true;

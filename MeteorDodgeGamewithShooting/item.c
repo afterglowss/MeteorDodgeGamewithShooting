@@ -18,7 +18,8 @@ void InitItem(Item* item) {
     lastInactiveTime = GetTime();  // 시작할 때 비활성화로 시작
 }
 
-void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime) {
+void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime, 
+    Sound invincibleSound, Sound getItemSound) {
     double currentTime = GetTime();
 
     //운석 일시정지 아이템
@@ -44,6 +45,9 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
             if (item->type == STOP_METEOR) {
                 *meteorFreeze = true;
                 *freezeStartTime = currentTime;
+
+                // 운석 정지 아이템을 먹었을 때 효과음
+                PlaySound(getItemSound);
             }
             item->active = false;
             lastInactiveTime = currentTime;
