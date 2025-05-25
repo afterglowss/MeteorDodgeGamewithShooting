@@ -40,7 +40,8 @@ void DrawParticles() {
     }
 }
 
-void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, const char** menuItems, int menuCount) {
+void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, 
+    const char** menuItems, int menuCount, Sound gameOverSound, bool *gameOverSoundPlayed) {
     if (!gameStarted) {
         DrawText("Meteor Dodge Game", 405, 200, 40, WHITE);
         DrawText("with Shooting", 460, 240, 40, WHITE);
@@ -54,6 +55,10 @@ void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selec
         DrawText(TextFormat("Score: %d", score), 10, 35, 20, YELLOW);
 
         if (gameOver) {
+            if (!(*gameOverSoundPlayed)) {
+                PlaySound(gameOverSound);
+                *gameOverSoundPlayed = true;
+            }
             DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.75f));
             DrawText("GAME OVER", 460, 330, 40, RED);
             DrawText(TextFormat("HIGHSCORE: %d", highScore), 450, 375, 30, YELLOW);
