@@ -58,7 +58,8 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, bool meteorFreeze, double freezeStartTime) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, 
+    bool meteorFreeze, double freezeStartTime, Sound collisionBullet, Sound collisionPlayer) {
     double currentTime = GetTime();
 
     bool freezeActive = meteorFreeze && (currentTime - freezeStartTime <= 3.0);
@@ -82,7 +83,11 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
         for (int j = 0; j < MAX_METEORS; j++) {
             if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
                 meteors[j].position, meteors[j].radius)) {
+                // 운석-총알 충돌 효과음 재생
+                PlaySound(collisionBullet);
+                // 충돌 이펙트 생성
                 GenerateExplosion(meteors[j].position, meteors[j].color);
+                // 부딪힌 총알 삭제
                 bullets[i].active = false;
                 // 총알과 운석이 충돌했을 경우 점수 100점 추가
                 *score += 100;
@@ -113,6 +118,8 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
 
         if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
             meteors[i].position, meteors[i].radius)) {
+            // 운석-플레이어 충돌 효과음 재생
+            PlaySound(collisionPlayer);
             GenerateExplosion(playerRef->position, RED);
             playerCollision(playerRef);
             playerRef->lives--;
