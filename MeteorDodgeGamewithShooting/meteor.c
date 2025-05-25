@@ -81,19 +81,32 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
         if (!bullets[i].active) continue;
 
         for (int j = 0; j < MAX_METEORS; j++) {
-            if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
-                meteors[j].position, meteors[j].radius)) {
+            bool hit = false;
+
+            if (bullets[i].isLaser) {
+                hit = CheckCollisionCircleLine(meteors[j].position, meteors[j].radius,
+                    bullets[i].position, GetLaserEndPos(&bullets[i]));
+            }
+            else {
+                hit = CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
+                    meteors[j].position, meteors[j].radius);
+            }
+
+            if (hit) {
                 // 운석-총알 충돌 효과음 재생
                 PlaySound(collisionBullet);
                 // 충돌 이펙트 생성
                 GenerateExplosion(meteors[j].position, meteors[j].color);
+
                 // 부딪힌 총알 삭제
-                bullets[i].active = false;
+                if (!bullets[i].isLaser)
+                    bullets[i].active = false;
+
                 // 총알과 운석이 충돌했을 경우 점수 100점 추가
                 *score += 100;
                 checkScore += 100;
                 //1000점 획득 할 때마다 속도 +0.5f
-                if (checkScore / 1000 == 1) 
+                if (checkScore / 1000 == 1)
                 {
                     speed += 0.5f;
                     checkScore = 0;

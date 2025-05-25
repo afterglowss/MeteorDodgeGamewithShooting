@@ -6,27 +6,29 @@
 static int shootCooldown = 0;
 
 //총알 생성, player의 head에서 생성되게
-void FireBullet(Bullet *bullets, Player* playerRef, Sound fire) {
+void FireBulletOrLaser(Bullet* bullets, Player* playerRef, Sound fire) {
 	if (shootCooldown > 0) return;
 	PlaySound(fire);
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (!bullets[i].active) {
 			bullets[i].active = true;
+			bullets[i].isLaser = playerRef->laserMode;
+			//bullets[i].isLaser = false;
 
 			float rad = playerRef->angle * (PI / 180.0f);
 
 			//플레이어 head 위치에서 생성
-			bullets[i].position = (Vector2){
-				playerRef->position.x + PLAYER_SIZE * cos(rad),
-				playerRef->position.y + PLAYER_SIZE * sin(rad)
-			};
+			bullets[i].position = playerRef->head;
 
 			//플레이어 방향으로 생성
 			Vector2 direction = (Vector2){
 				cosf(rad),
 				sinf(rad)
 			};
-			bullets[i].velocity = (Vector2){ direction.x * BULLET_SPEED, direction.y * BULLET_SPEED };
+
+			float speed = playerRef->laserMode ? LASER_SPEED : BULLET_SPEED;
+
+			bullets[i].velocity = (Vector2){ direction.x * speed, direction.y * speed };
 
 			shootCooldown = SHOOT_COOLDOWN_FRAMES;
 			break;
@@ -55,8 +57,23 @@ void UpdateBullets(Bullet* bullets) {
 //총알 그리기
 void DrawBullets(Bullet* bullets) {
 	for (int i = 0; i < MAX_BULLETS; i++) {
-		if (bullets[i].active) {
+		if (!bullets[i].active) continue;
+
+		if (bullets[i].isLaser) {
+			DrawLineEx(bullets[i].position, GetLaserEndPos(&bullets[i]), 3.0f, ORANGE);
+		}
+		else {
 			DrawCircleV(bullets[i].position, BULLET_RADIUS, YELLOW);
 		}
 	}
+}
+
+Vector2 GetLaserEndPos(Bullet* bullets) {
+	if (!bullets->isLaser) return bullets->position;
+
+	Vector2 endPos = {
+		bullets->position.x + bullets->velocity.x * LASER_LENGTH,
+		bullets->position.y + bullets->velocity.y * LASER_LENGTH,
+	};
+	return endPos;
 }
