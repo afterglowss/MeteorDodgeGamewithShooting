@@ -164,5 +164,10 @@ void UpdatePlayer(Player* playerRef) {
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
 
+    //레이저 모드 확인
+    if (playerRef->laserMode && (GetTime() - playerRef->laserStartTime > 5.0)) {
+        playerRef->laserMode = false;
+    }
+
     ScreenRestrictPlayer(playerRef);
 }

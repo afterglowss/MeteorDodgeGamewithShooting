@@ -13,7 +13,8 @@ static double lastInactiveTime = 0.0; // 아이템이 사라진 시점
 void InitItem(Item* item) {
     item->active = false;
     item->position = (Vector2){ 0, 0 };
-    item->type = STOP_METEOR;
+    //item->type = STOP_METEOR;
+    item->type = LASER_GUN;
     itemActiveTime = 0;
     lastInactiveTime = GetTime();  // 시작할 때 비활성화로 시작
 }
@@ -27,7 +28,8 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
     if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
         item->active = true;
         item->position = (Vector2){ rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT };
-        item->type = STOP_METEOR;
+        //item->type = STOP_METEOR;
+        item->type = LASER_GUN;
         itemActiveTime = currentTime;
     }
 
@@ -42,13 +44,26 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
 
         // 플레이어가 아이템을 먹었는지 확인
         if (CheckCollisionCircles(player->position, PLAYER_SIZE / 2.0f, item->position, ITEM_RADIUS)) {
-            if (item->type == STOP_METEOR) {
+            switch (item->type)
+            {
+            //운석 정지 아이템
+            case STOP_METEOR:
                 *meteorFreeze = true;
                 *freezeStartTime = currentTime;
 
                 // 운석 정지 아이템을 먹었을 때 효과음
                 PlaySound(getItemSound);
+                break;
+
+            //레이저 건 아이템
+            case LASER_GUN:
+                player->laserMode = true;
+                player->laserStartTime = currentTime;
+
+                PlaySound(getItemSound);
+                break;
             }
+            
             item->active = false;
             lastInactiveTime = currentTime;
         }

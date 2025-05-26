@@ -4,8 +4,8 @@
 
 typedef enum {
     STOP_METEOR = 0,
-    INVINCIBLE_PLAYER,
-    LASER_GUN
+    INVINCIBLE_PLAYER = 1,
+    LASER_GUN = 2
 } ItemType;
 
 typedef struct Item {
