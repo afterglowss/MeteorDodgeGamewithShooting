@@ -57,5 +57,39 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
 
 void DrawItem(Item* item) {
     if (!item->active) return;
-    DrawCircleLines((int)item->position.x, (int)item->position.y, ITEM_RADIUS, RED);
+    DrawCircleLines((int)item->position.x, (int)item->position.y, ITEM_RADIUS, BLACK);
+    DrawStar(item->position, ITEM_RADIUS - 1, 5, RED, RED);
+}
+
+
+void DrawStar(Vector2 center, float radius, int points, Color fillColor, Color outlineColor) {
+    if (points < 2) return;
+
+    float angleStep = 2 * PI / (points * 2);
+    Vector2* starVertices = (Vector2*)malloc(sizeof(Vector2) * points * 2);
+    if (!starVertices) return;
+
+    for (int i = 0; i < points * 2; i++) {
+        float r = (i % 2 == 0) ? radius : radius * 0.5f;
+        float angle = i * angleStep - PI / 2;
+        starVertices[i] = (Vector2){
+            center.x + cosf(angle) * r,
+            center.y + sinf(angle) * r
+        };
+    }
+
+    // Fill each star arm as triangle (outer - inner - next outer)
+    for (int i = 0; i < points; i++) {
+        int outer = i * 2;
+        int inner = (outer + 1) % (points * 2);
+        int nextOuter = (outer + 2) % (points * 2);
+        DrawTriangle(starVertices[outer], starVertices[inner], starVertices[nextOuter], fillColor);
+    }
+
+    // Draw outline
+    for (int i = 0; i < points * 2; i++) {
+        DrawLineV(starVertices[i], starVertices[(i + 1) % (points * 2)], outlineColor);
+    }
+
+    free(starVertices);
 }
