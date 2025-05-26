@@ -2,6 +2,7 @@
 #include "game.h"
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #define ITEM_RADIUS 15
 #define ITEM_VISIBLE_DURATION 5.0     // 아이템이 유지되는 시간 (초)
@@ -57,39 +58,51 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
 
 void DrawItem(Item* item) {
     if (!item->active) return;
-    DrawCircleLines((int)item->position.x, (int)item->position.y, ITEM_RADIUS, Fade(BLACK, 0.0f));
-    DrawStar(item->position, ITEM_RADIUS - 1, 5, RED, RED);
+
+    switch (item->type)
+    {
+        //운석 정지 아이템
+    case STOP_METEOR:
+        DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, GREEN);
+        break;
+        //플레이어 무적 아이템
+    case INVINCIBLE_PLAYER:
+        DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, YELLOW);
+        break;
+        //레이저 건 아이템
+    case LASER_GUN:
+        DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, ORANGE);
+        break;
+    }
 }
 
+void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotationAngleDeg, Color color)
+{
+    Vector2 vertices[10]; // 정적 배열로 선언 (가장 안전)
 
-void DrawStar(Vector2 center, float radius, int points, Color fillColor, Color outlineColor) {
-    if (points < 2) return;
+    // 회전 각도를 라디안으로 변환
+    float rotationAngleRad = rotationAngleDeg * (PI / 180.0f);
 
-    float angleStep = 2 * PI / (points * 2);
-    Vector2* starVertices = (Vector2*)malloc(sizeof(Vector2) * points * 2);
-    if (!starVertices) return;
+    // 10개의 꼭짓점 계산
+    for (int i = 0; i < 10; i++)
+    {
+        float angle = (i * PI / 5.0f) + rotationAngleRad - (PI / 2.0f);
 
-    for (int i = 0; i < points * 2; i++) {
-        float r = (i % 2 == 0) ? radius : radius * 0.5f;
-        float angle = i * angleStep - PI / 2;
-        starVertices[i] = (Vector2){
-            center.x + cosf(angle) * r,
-            center.y + sinf(angle) * r
-        };
+        float currentRadius = (i % 2 == 0) ? outerRadius : innerRadius;
+
+        vertices[i].x = center.x + currentRadius * cosf(angle);
+        vertices[i].y = center.y + currentRadius * sinf(angle);
     }
 
-    // Fill each star arm as triangle (outer - inner - next outer)
-    for (int i = 0; i < points; i++) {
-        int outer = i * 2;
-        int inner = (outer + 1) % (points * 2);
-        int nextOuter = (outer + 2) % (points * 2);
-        DrawTriangle(starVertices[outer], starVertices[inner], starVertices[nextOuter], fillColor);
+    //5개의 바깥쪽 뾰족한 부분 (각 꼭지) 그리기
+    for (int i = 0; i < 5; i++)
+    {
+        DrawTriangle(vertices[(i * 2 + 1) % 10], vertices[i * 2], vertices[(i * 2 - 1 + 10) % 10], color);
     }
 
-    // Draw outline
-    for (int i = 0; i < points * 2; i++) {
-        DrawLineV(starVertices[i], starVertices[(i + 1) % (points * 2)], outlineColor);
+    //중앙의 오각형 채우기
+    for (int i = 0; i < 5; i++)
+    {
+        DrawTriangle(center, vertices[(i * 2 + 3) % 10], vertices[(i * 2 + 1) % 10], color);
     }
-
-    free(starVertices);
 }
