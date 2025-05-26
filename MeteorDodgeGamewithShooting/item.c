@@ -57,7 +57,7 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
 
 void DrawItem(Item* item) {
     if (!item->active) return;
-    DrawCircleLines((int)item->position.x, (int)item->position.y, ITEM_RADIUS, BLACK);
+    DrawCircleLines((int)item->position.x, (int)item->position.y, ITEM_RADIUS, Fade(BLACK, 0.0f));
     DrawStar(item->position, ITEM_RADIUS - 1, 5, RED, RED);
 }
 
