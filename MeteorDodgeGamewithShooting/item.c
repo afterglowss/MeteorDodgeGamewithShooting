@@ -26,7 +26,7 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
     // 아이템이 비활성 상태일 때, 일정 시간이 지나면 다시 생성
     if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
         item->active = true;
-        item->position = (Vector2){ rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT };
+        item->position = (Vector2){ 200 + rand() % 800, 100 + rand() % 600 };
         //아이템 랜덤 생성
         int itemIdx = rand() % 3;
         
