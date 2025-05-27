@@ -13,12 +13,12 @@ static double lastInactiveTime = 0.0; // 아이템이 사라진 시점
 void InitItem(Item* item) {
     item->active = false;
     item->position = (Vector2){ 0, 0 };
-    item->type = STOP_METEOR;
     itemActiveTime = 0;
     lastInactiveTime = GetTime();  // 시작할 때 비활성화로 시작
+    for (int i = 0; i < 3; i++) item->itemStartTime[i] = 0;
 }
 
-void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime) {
+void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound) {
     double currentTime = GetTime();
 
     //운석 일시정지 아이템
@@ -26,7 +26,24 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
     if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
         item->active = true;
         item->position = (Vector2){ rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT };
-        item->type = STOP_METEOR;
+        //아이템 랜덤 생성
+        int itemIdx = rand() % 3;
+        
+        switch (itemIdx)
+        {
+        case 0:
+            item->type = STOP_METEOR;
+            break;
+        case 1:
+            item->type = LASER_GUN;
+            break;
+        case 2:
+            item->type = INVINCIBLE_PLAYER;
+            break;
+        default:
+            break;
+        }
+        
         itemActiveTime = currentTime;
     }
 
@@ -38,13 +55,24 @@ void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeSt
             lastInactiveTime = currentTime;
             return;
         }
+        lastInactiveTime = currentTime;
 
         // 플레이어가 아이템을 먹었는지 확인
         if (CheckCollisionCircles(player->position, PLAYER_SIZE / 2.0f, item->position, ITEM_RADIUS)) {
-            if (item->type == STOP_METEOR) {
-                *meteorFreeze = true;
-                *freezeStartTime = currentTime;
+
+            switch (item->type)
+            {
+            case STOP_METEOR:
+                item->itemStartTime[0] = currentTime;
+            case LASER_GUN:
+                item->itemStartTime[1] = currentTime;
+            case INVINCIBLE_PLAYER:
+                item->itemStartTime[2] = currentTime;
+            default:
+                break;
             }
+            PlaySound(getItemSound);
+            item->isItem = true;
             item->active = false;
             lastInactiveTime = currentTime;
         }

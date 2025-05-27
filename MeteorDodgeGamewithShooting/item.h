@@ -2,8 +2,11 @@
 #include "raylib.h"
 #include "player.h"
 
+typedef struct Player Player;
+
+
 typedef enum {
-    STOP_METEOR = 0,
+    STOP_METEOR,
     INVINCIBLE_PLAYER,
     LASER_GUN
 } ItemType;
@@ -11,9 +14,11 @@ typedef enum {
 typedef struct Item {
     Vector2 position;
     bool active;
+    bool isItem;
     ItemType type;
+    double itemStartTime[3];
 } Item;
 
 void InitItem(Item* item);
-void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime);
+void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound);
 void DrawItem(Item* item);

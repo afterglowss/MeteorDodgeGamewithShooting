@@ -10,13 +10,15 @@
 #include "raylib.h"
 #include "raymath.h"
 
+typedef struct Item Item;
+
 struct Player
 {
 	Vector2 position;
-
 	Vector2 trail[TRAIL_LENGTH];
 	Vector2 velocity;
 	Vector2 head,left,right;
+	Color playerColor;
 	bool isCollision;
 	double deathTime;
 	float angle;
@@ -26,7 +28,7 @@ struct Player
 }typedef Player;
 
 void InitPlayer(Player *playerRef);
-void UpdatePlayer(Player *playerRef);
-void DrawPlayer(Player* playerRef); 
+void UpdatePlayer(Player *playerRef, Item* item);
+void DrawPlayer(Player* playerRef, Item* item);
 void playerCollision(Player* playerRef);
 

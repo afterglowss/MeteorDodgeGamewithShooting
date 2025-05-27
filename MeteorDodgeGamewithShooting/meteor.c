@@ -58,11 +58,13 @@ void InitMeteors(Meteor* meteors) {
 }
 
 //운석 위치 업데이트-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, bool meteorFreeze, double freezeStartTime) {
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* score, bool* gameOver,
+    Item* item, Sound collisionBullet, Sound collisionPlayer) {
     double currentTime = GetTime();
 
-    bool freezeActive = meteorFreeze && (currentTime - freezeStartTime <= 3.0);
-    
+  
+    bool freezeActive = item->isItem && (item->type == STOP_METEOR) && (currentTime - item->itemStartTime[0] <= 3.0);
+
     for (int i = 0; i < MAX_METEORS; i++) {
         if (!freezeActive) {
             meteors[i].position.x += meteors[i].velocity.x;
@@ -80,6 +82,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
         if (!bullets[i].active) continue;
 
         for (int j = 0; j < MAX_METEORS; j++) {
+
             if (CheckCollisionCircles(bullets[i].position, BULLET_RADIUS,
                 meteors[j].position, meteors[j].radius)) {
                 GenerateExplosion(meteors[j].position, meteors[j].color);
@@ -110,8 +113,10 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
 
     //운석-플레이어 충돌 처리: 19
     for (int i = 0; i < MAX_METEORS; i++) {
-
-        if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
+        
+        if (item->isItem && item->type == INVINCIBLE_PLAYER) break;
+        
+        else if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
             meteors[i].position, meteors[i].radius)) {
             GenerateExplosion(playerRef->position, RED);
             playerCollision(playerRef);
@@ -120,6 +125,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
             if (playerRef->lives <= 0) *gameOver = true;
             break;
         }
+        
     }
 }
 

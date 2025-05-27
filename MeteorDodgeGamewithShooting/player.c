@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "game.h"
+#include "item.h"
+#include "time.h"
 
 void InitPlayer(Player* playerRef) {
-
+    playerRef->playerColor = RED;
     playerRef->position = (Vector2){ 600, 400 };  // 초기 위치
     playerRef->velocity = (Vector2){ 0, 0 };      // 초기 속도
     playerRef->head = (Vector2){ 0, 0 };
@@ -24,7 +26,7 @@ void playerCollision(Player* playerRef) {
     playerRef->trailIdx = 0;
 }
 
-void DrawPlayer(Player* playerRef) {
+void DrawPlayer(Player* playerRef, Item *item) {
     float rad = playerRef->angle * (PI / 180.0f);
 
     // 플레이어가 바라보는 위치
@@ -53,7 +55,7 @@ void DrawPlayer(Player* playerRef) {
 
     //########## 플레이어 깜빡임 처리 #########//
 
-    if (playerRef->isCollision == true) {
+    if (playerRef->isCollision == true && !(item->isItem && item->type == INVINCIBLE_PLAYER)) {
         double diffTime = GetTime() - playerRef->deathTime;
         if (diffTime < 2) {
             if (fmod(diffTime, 0.4) < 0.2) {
@@ -67,6 +69,34 @@ void DrawPlayer(Player* playerRef) {
             playerRef->isCollision = false;
         }
         DrawText(TextFormat("%.2f", diffTime), 10, 10, 20, RED);
+    }
+    else if (item->isItem && item->type == INVINCIBLE_PLAYER) {
+        double diffTime = GetTime() - item->itemStartTime[2];
+        if (diffTime < INVINCIBLE_TIME) {
+
+            Color rainbowColors[] = {
+                RED, ORANGE, YELLOW, GREEN, BLUE, DARKBLUE, PURPLE
+            };
+            int rainbowCount = sizeof(rainbowColors) / sizeof(rainbowColors[0]);
+
+            static int currentColorIndex = 0;
+            static double lastColorChangeTime = 0;
+
+            double currentTime = GetTime();
+            double blinkInterval = 0.1; 
+
+            // 일정 시간 경과 시 다음 색상으로 전환
+            if (currentTime - lastColorChangeTime > blinkInterval) {
+                currentColorIndex = (currentColorIndex + 1) % rainbowCount;
+                lastColorChangeTime = currentTime;
+            }
+            playerRef->playerColor = rainbowColors[currentColorIndex];
+            DrawCircleV(playerRef->position, 5.0f, playerRef->playerColor);
+            DrawTriangle(playerRef->head, playerRef->left, playerRef->right, playerRef->playerColor);
+
+        }
+        else
+            item->isItem = false;
     }
     else {
         DrawCircleV(playerRef->position, 5.0f, RED);
@@ -105,9 +135,7 @@ void ScreenRestrictPlayer(Player* playerRef) {
     }
 }
 
-
-
-void UpdatePlayer(Player* playerRef) {
+void UpdatePlayer(Player* playerRef, Item* item) {
     float deltaTime = GetFrameTime();
     float rad = (PI / 180.0f);
     float turnspeed = 360.0;
@@ -163,6 +191,12 @@ void UpdatePlayer(Player* playerRef) {
     //트레일 위치 저장
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
+
+    /*
+    if (item->type == LASER_GUN && item->isItem) {
+        item->isItem = false;
+    }
+    */
 
     ScreenRestrictPlayer(playerRef);
 }

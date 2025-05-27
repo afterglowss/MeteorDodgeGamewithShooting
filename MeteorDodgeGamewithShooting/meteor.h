@@ -6,6 +6,7 @@
 #include "bullet.h"
 #include <stdlib.h>
 #include <time.h>
+#include "item.h"
 
 #define MAX_METEORS 40
 #define minBright 100
@@ -20,6 +21,7 @@ typedef struct Meteor {
 }Meteor;
 
 void InitMeteors(Meteor* meteors);
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, bool meteorFreeze, double freezeStartTime);
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* score, bool* gameOver,
+	Item* item, Sound collisionBullet, Sound collisionPlayer);
 void DrawMeteors(Meteor* meteors);
 void RespawnMeteor(Meteor* m, int index);
