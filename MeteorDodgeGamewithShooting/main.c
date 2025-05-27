@@ -9,37 +9,37 @@ int main(void)
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Meteor Dodge Game With Shooting");
     SetTargetFPS(60);
 
-    // ¿Àµğ¿À ÃÊ±âÈ­
+    // ì˜¤ë””ì˜¤ ì´ˆê¸°í™”
     InitAudioDevice();
 
-    //¸ŞÀÎ È­¸é bgm
+    //ë©”ì¸ í™”ë©´ bgm
     Music mainSceneMusic = LoadMusicStream("resources/mainSceneMusic.wav");
     SetMusicVolume(mainSceneMusic, 1.0f);
-    //°ÔÀÓ È­¸é bgm
+    //ê²Œì„ í™”ë©´ bgm
     Music gameSceneMusic = LoadMusicStream("resources/gameSceneMusic.wav");
     SetMusicVolume(gameSceneMusic, 1.0f);
-    //ÃÑ¾Ë ¹ß»ç sound
+    //ì´ì•Œ ë°œì‚¬ sound
     Sound fireSound = LoadSound("resources/fire.wav");
     SetSoundVolume(fireSound, 0.1f);
-    //°ÔÀÓ ¿À¹ö sound
+    //ê²Œì„ ì˜¤ë²„ sound
     Sound gameOverSound = LoadSound("resources/gameOver.wav");
     SetSoundVolume(gameOverSound, 1.0f);
-    //¸Ş´º ÀÌµ¿ sound
+    //ë©”ë‰´ ì´ë™ sound
     Sound menuSound = LoadSound("resources/menu.wav");
     SetSoundVolume(menuSound, 0.3f);
-    //¿î¼®-ÇÃ·¹ÀÌ¾î Ãæµ¹ sound
+    //ìš´ì„-í”Œë ˆì´ì–´ ì¶©ëŒ sound
     Sound collisionPlayerSound = LoadSound("resources/collisionPlayer.wav");
     SetSoundVolume(collisionPlayerSound, 0.2f);
-    //¿î¼®-ÃÑ¾Ë Ãæµ¹ sound
+    //ìš´ì„-ì´ì•Œ ì¶©ëŒ sound
     Sound collisionBulletSound = LoadSound("resources/collisionBullet.wav");
     SetSoundVolume(collisionBulletSound, 0.2f);
-    //·¹ÀÌÀú
+    //ë ˆì´ì €
     Sound laserSound = LoadSound("resources/laser.wav");
     SetSoundVolume(laserSound, 0.1f);
-    //¹«Àû
+    //ë¬´ì 
     Sound invincibleSound = LoadSound("resources/invincible.wav");
     SetSoundVolume(invincibleSound, 0.5f);
-    //¾ÆÀÌÅÛ È¹µæ (¿î¼® Á¤Áö, ·¹ÀÌÀú ¾ÆÀÌÅÛ È¹µæ ½Ã Àû¿ë)
+    //ì•„ì´í…œ íšë“ (ìš´ì„ ì •ì§€, ë ˆì´ì € ì•„ì´í…œ íšë“ ì‹œ ì ìš©)
     Sound getItemSound = LoadSound("resources/getItem.wav");
     SetSoundVolume(getItemSound, 0.5f);
 
@@ -52,13 +52,13 @@ int main(void)
 
     Bullet bullets[MAX_BULLETS] = { 0 };
 
-    //¾ÆÀÌÅÛ Ãß°¡
+    //ì•„ì´í…œ ì¶”ê°€
     Item item;
     InitItem(&item);
     bool meteorFreeze = false;
     double freezeStartTime = 0.0;
 
-    //»ç¿îµå °ü·Ã flag
+    //ì‚¬ìš´ë“œ ê´€ë ¨ flag
     bool gameOverSoundPlayed = false;
 
     bool gameStarted = false;
@@ -75,55 +75,54 @@ int main(void)
             gameStarted = false;
             continue;
         }
-        
-        //°ÔÀÓ ½ÃÀÛ Àü
+        //ê²Œì„ ì‹œì‘ ì „
         if (!gameStarted) {
             BeginDrawing();
             ClearBackground(BLACK);
-            DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems, 
+            DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems,
                 menuCount, gameOverSound, &gameOverSoundPlayed);
             EndDrawing();
 
             if (!IsMusicStreamPlaying(mainSceneMusic)) {
                 PlayMusicStream(mainSceneMusic);
             }
-            //¸ŞÀÎ È­¸é bgm Áö¼ÓÇØ¼­ ½ºÆ®¸®¹Ö
+            //ë©”ì¸ í™”ë©´ bgm ì§€ì†í•´ì„œ ìŠ¤íŠ¸ë¦¬ë°
             UpdateMusicStream(mainSceneMusic);
 
-            if (IsKeyPressed(KEY_DOWN)) { 
+            if (IsKeyPressed(KEY_DOWN)) {
                 PlaySound(menuSound);
-                selectedMenu = (selectedMenu + 1) % menuCount; 
+                selectedMenu = (selectedMenu + 1) % menuCount;
             }
             else if (IsKeyPressed(KEY_UP)) {
                 PlaySound(menuSound);
                 selectedMenu = (selectedMenu - 1 + menuCount) % menuCount;
             }
-            // ¸Ş´º Áß ÇÏ³ª¸¦ °í¸¥ °æ¿ì
+            // ë©”ë‰´ ì¤‘ í•˜ë‚˜ë¥¼ ê³ ë¥¸ ê²½ìš°
             else if (IsKeyPressed(KEY_ENTER)) {
-                // Start ¹öÆ° Enter
+                // Start ë²„íŠ¼ Enter
                 if (selectedMenu == 0) {
-                    // °ÔÀÓ ½ÃÀÛ »óÈ²
+                    // ê²Œì„ ì‹œì‘ ìƒí™©
                     gameStarted = true;
-                    // ÇÃ·¹ÀÌ¾î ÃÊ±âÈ­
+                    // í”Œë ˆì´ì–´ ì´ˆê¸°í™”
                     InitPlayer(&player);
-                    // ¿î¼® ÃÊ±âÈ­
+                    // ìš´ì„ ì´ˆê¸°í™”
                     InitMeteors(meteors);
 
-                    //¾ÆÀÌÅÛ ÃÊ±âÈ­
+                    //ì•„ì´í…œ ì´ˆê¸°í™”
                     InitItem(&item);
 
-                    // ÃÑ¾Ë ÀüºÎ ºñÈ°¼ºÈ­
+                    // ì´ì•Œ ì „ë¶€ ë¹„í™œì„±í™”
                     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
-                    // Ãæµ¹ ÆÄÆ¼Å¬ ºñÈ°¼ºÈ­
+                    // ì¶©ëŒ íŒŒí‹°í´ ë¹„í™œì„±í™”
                     for (int i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
-                    // ÃÑ¾Ë ÄğÅ¸ÀÓ, Á¡¼ö, Á¡¼ö¿¡ µû¸¥ ¿î¼® ¼Óµµ ÃÊ±âÈ­ (=0) ÇÊ¿ä
+                    // ì´ì•Œ ì¿¨íƒ€ì„, ì ìˆ˜, ì ìˆ˜ì— ë”°ë¥¸ ìš´ì„ ì†ë„ ì´ˆê¸°í™” (=0) í•„ìš”
                     score = 0;
                     gameOver = false;
-                    //°ÔÀÓ ¿À¹ö »ç¿îµå Àç»ı ¿©ºÎ ÆÇ´Ü¿¡ ÇÊ¿äÇÑ flag false
+                    //ê²Œì„ ì˜¤ë²„ ì‚¬ìš´ë“œ ì¬ìƒ ì—¬ë¶€ íŒë‹¨ì— í•„ìš”í•œ flag false
                     gameOverSoundPlayed = false;
 
                 }
-                // Score ¹öÆ° ¿£ÅÍ
+                // Score ë²„íŠ¼ ì—”í„°
                 else if (selectedMenu == 1) {
                     while (!WindowShouldClose()) {
                         BeginDrawing();
@@ -134,15 +133,15 @@ int main(void)
                         }
                         UpdateMusicStream(mainSceneMusic);
 
-                        // ÃÖ°íÁ¡¼ö º¸¿©ÁÖ±â
+                        // ìµœê³ ì ìˆ˜ ë³´ì—¬ì£¼ê¸°
                         DrawText(TextFormat("High Score: %d", highScore), 450, 360, 30, YELLOW);
                         DrawText("Press ENTER to return", 430, 420, 20, LIGHTGRAY);
                         EndDrawing();
-                        // ¿£ÅÍ Ä¡¸é ÀÌÀü ¸Ş´º·Î µ¹¾Æ°¡±â
+                        // ì—”í„° ì¹˜ë©´ ì´ì „ ë©”ë‰´ë¡œ ëŒì•„ê°€ê¸°
                         if (IsKeyPressed(KEY_ENTER)) break;
                     }
                 }
-                // Credits ¹öÆ° ¿£ÅÍ
+                // Credits ë²„íŠ¼ ì—”í„°
                 else if (selectedMenu == 2) {
                     while (!WindowShouldClose()) {
                         BeginDrawing();
@@ -163,7 +162,7 @@ int main(void)
                         if (IsKeyPressed(KEY_ENTER)) break;
                     }
                 }
-                //Exit ¹öÆ° ¿£ÅÍ
+                //Exit ë²„íŠ¼ ì—”í„°
                 else if (selectedMenu == 3) {
                     CloseWindow();
                     return 0;
@@ -171,20 +170,20 @@ int main(void)
             }
             continue;
         }
-        // °ÔÀÓÀº ½ÃÀÛÀÌ µÆ°í, game over ´Â ¾Æ´Ò °æ¿ì
+        // ê²Œì„ì€ ì‹œì‘ì´ ëê³ , game over ëŠ” ì•„ë‹ ê²½ìš°
         if (!gameOver) {
-            // ¹İº¹¹® ¾È¿¡¼­ Update ÇÔ¼ö °è¼Ó È£Ãâ
-            UpdatePlayer(&player);
+            // ë°˜ë³µë¬¸ ì•ˆì—ì„œ Update í•¨ìˆ˜ ê³„ì† í˜¸ì¶œ
+            UpdatePlayer(&player, &item);
             UpdateBullets(bullets);
-            UpdateMeteors(meteors, &player, bullets, &score, &gameOver, 
-                meteorFreeze, freezeStartTime, collisionBulletSound, collisionPlayerSound);
+            UpdateMeteors(meteors, &player, bullets, &score, &gameOver,
+                &item, collisionBulletSound, collisionPlayerSound);
             UpdateParticles();
 
 
-            //¾ÆÀÌÅÛ ¾÷µ¥ÀÌÆ®
-            UpdateItem(&item, &player, &meteorFreeze, &freezeStartTime, invincibleSound, getItemSound);
+            //ì•„ì´í…œ ì—…ë°ì´íŠ¸
+            UpdateItem(&item, &player, invincibleSound, getItemSound);
 
-            //bgm Àç»ı ¹× ½ºÆ®¸®¹Ö
+            //bgm ì¬ìƒ ë° ìŠ¤íŠ¸ë¦¬ë°
             if (!IsMusicStreamPlaying(gameSceneMusic)) {
                 StopMusicStream(gameSceneMusic);
                 PlayMusicStream(gameSceneMusic);
@@ -193,19 +192,19 @@ int main(void)
 
             if (IsKeyDown(KEY_SPACE)) {
                 //if (!IsSoundPlaying(fire)) PlaySound(fire);
-                FireBullet(bullets, &player, fireSound);
+                FireBulletOrLaser(bullets, &player, &item, fireSound);
             }
         }
 
-        // gameStarted = true, gameOver = true °ÔÀÓ¿À¹ö È­¸é »óÅÂ¿¡¼­ ¿£ÅÍÅ°·Î ¹Ù·Î Àç½ÃÀÛ
+        // gameStarted = true, gameOver = true ê²Œì„ì˜¤ë²„ í™”ë©´ ìƒíƒœì—ì„œ ì—”í„°í‚¤ë¡œ ë°”ë¡œ ì¬ì‹œì‘
         else if (IsKeyPressed(KEY_ENTER)) {
             InitPlayer(&player);
             InitMeteors(meteors);
-            // ÃÑ¾Ë ÀüºÎ ºñÈ°¼ºÈ­
+            // ì´ì•Œ ì „ë¶€ ë¹„í™œì„±í™”
             for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
-            // Ãæµ¹ ÆÄÆ¼Å¬ ºñÈ°¼ºÈ­
+            // ì¶©ëŒ íŒŒí‹°í´ ë¹„í™œì„±í™”
             for (int i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
-            // score ÃÊ±âÈ­
+            // score ì´ˆê¸°í™”
             score = 0;
             gameOver = false;
             gameOverSoundPlayed = false;
@@ -213,20 +212,20 @@ int main(void)
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawPlayer(&player);
+        DrawPlayer(&player,&item);
         DrawMeteors(meteors);
-        DrawBullets(bullets);
+        DrawBullets(bullets, &item);
 
-        //¾ÆÀÌÅÛ ±×¸®±â
+        //ì•„ì´í…œ ê·¸ë¦¬ê¸°
         DrawItem(&item);
 
         DrawParticles();
-        DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems, 
+        DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems,
             menuCount, gameOverSound, &gameOverSoundPlayed);
         EndDrawing();
     }
 
-    // È¿°úÀ½ ÇÒ´ç ÇØÁ¦
+    // íš¨ê³¼ìŒ í• ë‹¹ í•´ì œ
     UnloadMusicStream(mainSceneMusic);
     UnloadMusicStream(gameSceneMusic);
     UnloadSound(fireSound);

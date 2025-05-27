@@ -5,66 +5,78 @@
 #include <math.h>
 
 #define ITEM_RADIUS 15
-#define ITEM_VISIBLE_DURATION 5.0     // ¾ÆÀÌÅÛÀÌ À¯ÁöµÇ´Â ½Ã°£ (ÃÊ)
-#define ITEM_RESPAWN_DELAY 10.0       // ¾ÆÀÌÅÛÀÌ »ç¶óÁø ÈÄ ´Ù½Ã ³ªÅ¸³¯ ¶§±îÁöÀÇ ´ë±â ½Ã°£ (ÃÊ)
+#define ITEM_VISIBLE_DURATION 5.0     // ì•„ì´í…œì´ ìœ ì§€ë˜ëŠ” ì‹œê°„ (ì´ˆ)
+#define ITEM_RESPAWN_DELAY 10.0       // ì•„ì´í…œì´ ì‚¬ë¼ì§„ í›„ ë‹¤ì‹œ ë‚˜íƒ€ë‚  ë•Œê¹Œì§€ì˜ ëŒ€ê¸° ì‹œê°„ (ì´ˆ)
 
-static double itemActiveTime = 0.0;   // ¾ÆÀÌÅÛÀÌ ³ªÅ¸³­ ½ÃÁ¡
-static double lastInactiveTime = 0.0; // ¾ÆÀÌÅÛÀÌ »ç¶óÁø ½ÃÁ¡
+static double itemActiveTime = 0.0;   // ì•„ì´í…œì´ ë‚˜íƒ€ë‚œ ì‹œì 
+static double lastInactiveTime = 0.0; // ì•„ì´í…œì´ ì‚¬ë¼ì§„ ì‹œì 
 
 void InitItem(Item* item) {
     item->active = false;
     item->position = (Vector2){ 0, 0 };
-    //item->type = STOP_METEOR;
-    item->type = LASER_GUN;
     itemActiveTime = 0;
-    lastInactiveTime = GetTime();  // ½ÃÀÛÇÒ ¶§ ºñÈ°¼ºÈ­·Î ½ÃÀÛ
+    lastInactiveTime = GetTime();  // ì‹œì‘í•  ë•Œ ë¹„í™œì„±í™”ë¡œ ì‹œì‘
+    for (int i = 0; i < 3; i++) item->itemStartTime[i] = 0;
 }
 
-void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime, 
-    Sound invincibleSound, Sound getItemSound) {
+void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound) {
     double currentTime = GetTime();
 
-    //¿î¼® ÀÏ½ÃÁ¤Áö ¾ÆÀÌÅÛ
-    // ¾ÆÀÌÅÛÀÌ ºñÈ°¼º »óÅÂÀÏ ¶§, ÀÏÁ¤ ½Ã°£ÀÌ Áö³ª¸é ´Ù½Ã »ı¼º
+    //ìš´ì„ ì¼ì‹œì •ì§€ ì•„ì´í…œ
+    // ì•„ì´í…œì´ ë¹„í™œì„± ìƒíƒœì¼ ë•Œ, ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ë©´ ë‹¤ì‹œ ìƒì„±
     if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
         item->active = true;
         item->position = (Vector2){ rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT };
-        //item->type = STOP_METEOR;
-        item->type = LASER_GUN;
+        //ì•„ì´í…œ ëœë¤ ìƒì„±
+        int itemIdx = rand() % 3;
+        
+        switch (itemIdx)
+        {
+        case 0:
+            item->type = STOP_METEOR;
+            break;
+        case 1:
+            item->type = LASER_GUN;
+            break;
+        case 2:
+            item->type = INVINCIBLE_PLAYER;
+            break;
+        default:
+            break;
+        }
+        
         itemActiveTime = currentTime;
     }
 
-    // ¾ÆÀÌÅÛÀÌ È°¼º »óÅÂÀÏ ¶§
+    // ì•„ì´í…œì´ í™œì„± ìƒíƒœì¼ ë•Œ
     if (item->active) {
-        // ½Ã°£ÀÌ ´Ù Áö³ª¸é ÀÚµ¿ ºñÈ°¼ºÈ­
+        // ì‹œê°„ì´ ë‹¤ ì§€ë‚˜ë©´ ìë™ ë¹„í™œì„±í™”
         if (currentTime - itemActiveTime >= ITEM_VISIBLE_DURATION) {
             item->active = false;
             lastInactiveTime = currentTime;
             return;
         }
+        lastInactiveTime = currentTime;
 
-        // ÇÃ·¹ÀÌ¾î°¡ ¾ÆÀÌÅÛÀ» ¸Ô¾ú´ÂÁö È®ÀÎ
+        // í”Œë ˆì´ì–´ê°€ ì•„ì´í…œì„ ë¨¹ì—ˆëŠ”ì§€ í™•ì¸
         if (CheckCollisionCircles(player->position, PLAYER_SIZE / 2.0f, item->position, ITEM_RADIUS)) {
+
             switch (item->type)
             {
-            //¿î¼® Á¤Áö ¾ÆÀÌÅÛ
             case STOP_METEOR:
-                *meteorFreeze = true;
-                *freezeStartTime = currentTime;
-
-                // ¿î¼® Á¤Áö ¾ÆÀÌÅÛÀ» ¸Ô¾úÀ» ¶§ È¿°úÀ½
+                item->itemStartTime[0] = currentTime;
                 PlaySound(getItemSound);
-                break;
-
-            //·¹ÀÌÀú °Ç ¾ÆÀÌÅÛ
             case LASER_GUN:
-                player->laserMode = true;
-                player->laserStartTime = currentTime;
-
+                item->itemStartTime[1] = currentTime;
                 PlaySound(getItemSound);
+            case INVINCIBLE_PLAYER:
+                item->itemStartTime[2] = currentTime;
+                PlaySound(invincibleSound);
+            default:
                 break;
             }
             
+            item->isItem = true;
             item->active = false;
             lastInactiveTime = currentTime;
         }
@@ -76,15 +88,15 @@ void DrawItem(Item* item) {
 
     switch (item->type)
     {
-        //¿î¼® Á¤Áö ¾ÆÀÌÅÛ
+        //ìš´ì„ ì •ì§€ ì•„ì´í…œ
     case STOP_METEOR:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, GREEN);
         break;
-        //ÇÃ·¹ÀÌ¾î ¹«Àû ¾ÆÀÌÅÛ
+        //í”Œë ˆì´ì–´ ë¬´ì  ì•„ì´í…œ
     case INVINCIBLE_PLAYER:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, YELLOW);
         break;
-        //·¹ÀÌÀú °Ç ¾ÆÀÌÅÛ
+        //ë ˆì´ì € ê±´ ì•„ì´í…œ
     case LASER_GUN:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, ORANGE);
         break;
@@ -93,12 +105,12 @@ void DrawItem(Item* item) {
 
 void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotationAngleDeg, Color color)
 {
-    Vector2 vertices[10]; // Á¤Àû ¹è¿­·Î ¼±¾ğ (°¡Àå ¾ÈÀü)
+    Vector2 vertices[10]; // ì •ì  ë°°ì—´ë¡œ ì„ ì–¸ (ê°€ì¥ ì•ˆì „)
 
-    // È¸Àü °¢µµ¸¦ ¶óµğ¾ÈÀ¸·Î º¯È¯
+    // íšŒì „ ê°ë„ë¥¼ ë¼ë””ì•ˆìœ¼ë¡œ ë³€í™˜
     float rotationAngleRad = rotationAngleDeg * (PI / 180.0f);
 
-    // 10°³ÀÇ ²ÀÁşÁ¡ °è»ê
+    // 10ê°œì˜ ê¼­ì§“ì  ê³„ì‚°
     for (int i = 0; i < 10; i++)
     {
         float angle = (i * PI / 5.0f) + rotationAngleRad - (PI / 2.0f);
@@ -109,13 +121,13 @@ void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotati
         vertices[i].y = center.y + currentRadius * sinf(angle);
     }
 
-    //5°³ÀÇ ¹Ù±ùÂÊ »ÏÁ·ÇÑ ºÎºĞ (°¢ ²ÀÁö) ±×¸®±â
+    //5ê°œì˜ ë°”ê¹¥ìª½ ë¾°ì¡±í•œ ë¶€ë¶„ (ê° ê¼­ì§€) ê·¸ë¦¬ê¸°
     for (int i = 0; i < 5; i++)
     {
         DrawTriangle(vertices[(i * 2 + 1) % 10], vertices[i * 2], vertices[(i * 2 - 1 + 10) % 10], color);
     }
 
-    //Áß¾ÓÀÇ ¿À°¢Çü Ã¤¿ì±â
+    //ì¤‘ì•™ì˜ ì˜¤ê°í˜• ì±„ìš°ê¸°
     for (int i = 0; i < 5; i++)
     {
         DrawTriangle(center, vertices[(i * 2 + 3) % 10], vertices[(i * 2 + 1) % 10], color);

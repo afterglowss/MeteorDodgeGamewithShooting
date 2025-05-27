@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "game.h"
+#include "item.h"
+#include "time.h"
 
 void InitPlayer(Player* playerRef) {
-
-    playerRef->position = (Vector2){ 600, 400 };  // √ ±‚ ¿ßƒ°
-    playerRef->velocity = (Vector2){ 0, 0 };      // √ ±‚ º”µµ
+    playerRef->playerColor = RED;
+    playerRef->position = (Vector2){ 600, 400 };  // Ï¥àÍ∏∞ ÏúÑÏπò
+    playerRef->velocity = (Vector2){ 0, 0 };      // Ï¥àÍ∏∞ ÏÜçÎèÑ
     playerRef->head = (Vector2){ 0, 0 };
     playerRef->angle = 0.0f;
     playerRef->lives = 5;
@@ -24,25 +26,25 @@ void playerCollision(Player* playerRef) {
     playerRef->trailIdx = 0;
 }
 
-void DrawPlayer(Player* playerRef) {
+void DrawPlayer(Player* playerRef, Item *item) {
     float rad = playerRef->angle * (PI / 180.0f);
 
-    // «√∑π¿ÃæÓ∞° πŸ∂Û∫∏¥¬ ¿ßƒ°
+    // ÌîåÎ†àÏù¥Ïñ¥Í∞Ä Î∞îÎùºÎ≥¥Îäî ÏúÑÏπò
     playerRef->head.x = playerRef->position.x + PLAYER_SIZE * cos(rad);
     playerRef->head.y = playerRef->position.y + PLAYER_SIZE * sin(rad);
 
-    // -90µµ πÊ«‚ (øﬁ¬ )
+    // -90ÎèÑ Î∞©Ìñ• (ÏôºÏ™Ω)
     float leftRad = (playerRef->angle - 90.0f) * (PI / 180.0f);
     playerRef->left.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(leftRad);
     playerRef->left.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(leftRad);
 
-    // +90µµ πÊ«‚ (ø¿∏•¬ )
+    // +90ÎèÑ Î∞©Ìñ• (Ïò§Î•∏Ï™Ω)
     float rightRad = (playerRef->angle + 90.0f) * (PI / 180.0f);
     playerRef->right.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(rightRad);
     playerRef->right.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(rightRad);
 
 
-    //∆Æ∑π¿œ ±◊∏Æ±‚
+    //Ìä∏Î†àÏùº Í∑∏Î¶¨Í∏∞
     for (int i = 0; i < TRAIL_LENGTH; i++) {
         int idx = (playerRef->trailIdx + i) % TRAIL_LENGTH;
         float trace = (float)i / TRAIL_LENGTH;
@@ -51,9 +53,9 @@ void DrawPlayer(Player* playerRef) {
     }
 
 
-    //########## «√∑π¿ÃæÓ ±Ù∫˝¿” √≥∏Æ #########//
+    //########## ÌîåÎ†àÏù¥Ïñ¥ ÍπúÎπ°ÏûÑ Ï≤òÎ¶¨ #########//
 
-    if (playerRef->isCollision == true) {
+    if (playerRef->isCollision == true && !(item->isItem && item->type == INVINCIBLE_PLAYER)) {
         double diffTime = GetTime() - playerRef->deathTime;
         if (diffTime < 2) {
             if (fmod(diffTime, 0.4) < 0.2) {
@@ -67,6 +69,34 @@ void DrawPlayer(Player* playerRef) {
             playerRef->isCollision = false;
         }
         DrawText(TextFormat("%.2f", diffTime), 10, 10, 20, RED);
+    }
+    else if (item->isItem && item->type == INVINCIBLE_PLAYER) {
+        double diffTime = GetTime() - item->itemStartTime[2];
+        if (diffTime < INVINCIBLE_TIME) {
+
+            Color rainbowColors[] = {
+                RED, ORANGE, YELLOW, GREEN, BLUE, DARKBLUE, PURPLE
+            };
+            int rainbowCount = sizeof(rainbowColors) / sizeof(rainbowColors[0]);
+
+            static int currentColorIndex = 0;
+            static double lastColorChangeTime = 0;
+
+            double currentTime = GetTime();
+            double blinkInterval = 0.1; 
+
+            // ÏùºÏ†ï ÏãúÍ∞Ñ Í≤ΩÍ≥º Ïãú Îã§Ïùå ÏÉâÏÉÅÏúºÎ°ú Ï†ÑÌôò
+            if (currentTime - lastColorChangeTime > blinkInterval) {
+                currentColorIndex = (currentColorIndex + 1) % rainbowCount;
+                lastColorChangeTime = currentTime;
+            }
+            playerRef->playerColor = rainbowColors[currentColorIndex];
+            DrawCircleV(playerRef->position, 5.0f, playerRef->playerColor);
+            DrawTriangle(playerRef->head, playerRef->left, playerRef->right, playerRef->playerColor);
+
+        }
+        else
+            item->isItem = false;
     }
     else {
         DrawCircleV(playerRef->position, 5.0f, RED);
@@ -105,15 +135,13 @@ void ScreenRestrictPlayer(Player* playerRef) {
     }
 }
 
-
-
-void UpdatePlayer(Player* playerRef) {
+void UpdatePlayer(Player* playerRef, Item* item) {
     float deltaTime = GetFrameTime();
     float rad = (PI / 180.0f);
     float turnspeed = 360.0;
     float maxspeed = 10.0f;
 
-    // ¡◊∞Ì 1√ ∞£ ¡∂¿€ ¡¶«—
+    // Ï£ΩÍ≥† 1Ï¥àÍ∞Ñ Ï°∞Ïûë Ï†úÌïú
     bool canMove = true;
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
@@ -126,11 +154,11 @@ void UpdatePlayer(Player* playerRef) {
         return;
     }
 
-    // »∏¿¸
+    // ÌöåÏ†Ñ
     if (IsKeyDown(KEY_LEFT))  playerRef->angle -= turnspeed * deltaTime;
     if (IsKeyDown(KEY_RIGHT)) playerRef->angle += turnspeed * deltaTime;
 
-    // º”µµ ¡ı∞°
+    // ÏÜçÎèÑ Ï¶ùÍ∞Ä
     float acceleration = 0.0f;
     if (IsKeyDown(KEY_UP)) {
         acceleration = PLAYER_ACCEL;
@@ -140,34 +168,30 @@ void UpdatePlayer(Player* playerRef) {
         playerRef->velocity.y *= PLAYER_FRICTION;
     }
 
-    // πÊ«‚ ∞ËªÍ
+    // Î∞©Ìñ• Í≥ÑÏÇ∞
     Vector2 direction = {
         cosf(playerRef->angle * rad),
         sinf(playerRef->angle * rad)
     };
 
-    // º”µµ æ˜µ•¿Ã∆Æ
+    // ÏÜçÎèÑ ÏóÖÎç∞Ïù¥Ìä∏
     playerRef->velocity.x += direction.x * acceleration;
     playerRef->velocity.y += direction.y * acceleration;
 
-    // º”µµ ¡¶«—
+    // ÏÜçÎèÑ Ï†úÌïú
     float speed = Vector2Length(playerRef->velocity);
     if (speed > maxspeed) {
         playerRef->velocity = Vector2Scale(Vector2Normalize(playerRef->velocity), maxspeed);
     }
 
-    // ¿ßƒ° æ˜µ•¿Ã∆Æ
+    // ÏúÑÏπò ÏóÖÎç∞Ïù¥Ìä∏
     playerRef->position.x += playerRef->velocity.x;
     playerRef->position.y += playerRef->velocity.y;
 
-    //∆Æ∑π¿œ ¿ßƒ° ¿˙¿Â
+    //Ìä∏Î†àÏùº ÏúÑÏπò Ï†ÄÏû•
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
 
-    //∑π¿Ã¿˙ ∏µÂ »Æ¿Œ
-    if (playerRef->laserMode && (GetTime() - playerRef->laserStartTime > 5.0)) {
-        playerRef->laserMode = false;
-    }
 
     ScreenRestrictPlayer(playerRef);
 }

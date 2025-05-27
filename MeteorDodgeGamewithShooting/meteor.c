@@ -6,11 +6,11 @@ int highScore = 0;
 int checkScore = 0;
 float speed;
 
-// ¹«ÀÛÀ§ ¿î¼® »ı¼º ÇÔ¼ö
+// ë¬´ì‘ìœ„ ìš´ì„ ìƒì„± í•¨ìˆ˜
 void RespawnMeteor(Meteor* m, int index) {
     m->radius = (float)(rand() % 31 + 10);
 
-    // ¹«ÀÛÀ§ »ö»ó ÀúÀå(¹à°Ô)
+    // ë¬´ì‘ìœ„ ìƒ‰ìƒ ì €ì¥(ë°ê²Œ)
     m->color = (Color){
     minBright + rand() % (256 - minBright),
     minBright + rand() % (256 - minBright),
@@ -18,7 +18,7 @@ void RespawnMeteor(Meteor* m, int index) {
     255
     };
 
-    // È­¸é ¹Û ·£´ıÇÑ À§Ä¡
+    // í™”ë©´ ë°– ëœë¤í•œ ìœ„ì¹˜
     int edge = rand() % 4;
     switch (edge) {
     case 0: // TOP
@@ -36,19 +36,19 @@ void RespawnMeteor(Meteor* m, int index) {
     }
 
 
-    //È­¸é ¿ÜºÎ¿¡¼­ ³»ºÎ·Î ·£´ıÇÑ ¹æÇâ
+    //í™”ë©´ ì™¸ë¶€ì—ì„œ ë‚´ë¶€ë¡œ ëœë¤í•œ ë°©í–¥
     float angle = ((float)(rand() % 360)) * DEG2RAD;
     Vector2 direction = (Vector2){
         cosf(angle),
         sinf(angle)
     };
 
-    //¼Óµµ
+    //ì†ë„
     m->velocity = (Vector2){ direction.x * speed, direction.y * speed };
 }
 
 
-// ¿î¼® ÃÊ±âÈ­
+// ìš´ì„ ì´ˆê¸°í™”
 void InitMeteors(Meteor* meteors) {
     srand((unsigned int)time(NULL));
     speed = 3;
@@ -57,13 +57,14 @@ void InitMeteors(Meteor* meteors) {
     }
 }
 
-//¿î¼® À§Ä¡ ¾÷µ¥ÀÌÆ®-17
-void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *score, bool *gameOver, 
-    bool meteorFreeze, double freezeStartTime, Sound collisionBullet, Sound collisionPlayer) {
+//ìš´ì„ ìœ„ì¹˜ ì—…ë°ì´íŠ¸-17
+void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* score, bool* gameOver,
+    Item* item, Sound collisionBullet, Sound collisionPlayer) {
     double currentTime = GetTime();
 
-    bool freezeActive = meteorFreeze && (currentTime - freezeStartTime <= 3.0);
-    
+  
+    bool freezeActive = item->isItem && (item->type == STOP_METEOR) && (currentTime - item->itemStartTime[0] <= 3.0);
+
     for (int i = 0; i < MAX_METEORS; i++) {
         if (!freezeActive) {
             meteors[i].position.x += meteors[i].velocity.x;
@@ -72,11 +73,11 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
 
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
-            RespawnMeteor(&meteors[i], i);  // »èÁ¦µÈ meteor Àç»ç¿ë
+            RespawnMeteor(&meteors[i], i);  // ì‚­ì œëœ meteor ì¬ì‚¬ìš©
         }
     }
 
-    //¿î¼®-ÃÑ¾Ë Ãæµ¹ Ã³¸®: 20
+    //ìš´ì„-ì´ì•Œ ì¶©ëŒ ì²˜ë¦¬: 20
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!bullets[i].active) continue;
 
@@ -93,25 +94,25 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
             }
 
             if (hit) {
-                // ¿î¼®-ÃÑ¾Ë Ãæµ¹ È¿°úÀ½ Àç»ı
+                // ìš´ì„-ì´ì•Œ ì¶©ëŒ íš¨ê³¼ìŒ ì¬ìƒ
                 PlaySound(collisionBullet);
-                // Ãæµ¹ ÀÌÆåÆ® »ı¼º
+                // ì¶©ëŒ ì´í™íŠ¸ ìƒì„±
                 GenerateExplosion(meteors[j].position, meteors[j].color);
 
-                // ºÎµúÈù ÃÑ¾Ë »èÁ¦
+                // ë¶€ë”ªíŒ ì´ì•Œ ì‚­ì œ
                 if (!bullets[i].isLaser)
                     bullets[i].active = false;
 
-                // ÃÑ¾Ë°ú ¿î¼®ÀÌ Ãæµ¹ÇßÀ» °æ¿ì Á¡¼ö 100Á¡ Ãß°¡
+                // ì´ì•Œê³¼ ìš´ì„ì´ ì¶©ëŒí–ˆì„ ê²½ìš° ì ìˆ˜ 100ì  ì¶”ê°€
                 *score += 100;
                 checkScore += 100;
-                //1000Á¡ È¹µæ ÇÒ ¶§¸¶´Ù ¼Óµµ +0.5f
+                //1000ì  íšë“ í•  ë•Œë§ˆë‹¤ ì†ë„ +0.5f
                 if (checkScore / 1000 == 1)
                 {
                     speed += 0.5f;
                     checkScore = 0;
                 }
-                // ÃÖ°í Á¡¼öº¸´Ù ÇöÀç Á¡¼ö°¡ ³ôÀ» °æ¿ì ÃÖ°í Á¡¼ö °»½Å
+                // ìµœê³  ì ìˆ˜ë³´ë‹¤ í˜„ì¬ ì ìˆ˜ê°€ ë†’ì„ ê²½ìš° ìµœê³  ì ìˆ˜ ê°±ì‹ 
                 if (*score > highScore) highScore = *score;
                 RespawnMeteor(&meteors[j], j);
                 break;
@@ -119,31 +120,34 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int *sco
         }
     }
 
-    // ÇÃ·¹ÀÌ¾î ¹«Àû »óÅÂÀÏ °æ¿ì Ãæµ¹ °Ë»ç ¹«½Ã
+    // í”Œë ˆì´ì–´ ë¬´ì  ìƒíƒœì¼ ê²½ìš° ì¶©ëŒ ê²€ì‚¬ ë¬´ì‹œ
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
-        if (diffTime < 2.0) return;  // ¾ÆÁ÷ ¹«Àû »óÅÂ¸é Ãæµ¹ °Ë»ç °Ç³Ê¶Ü
-        else playerRef->isCollision = false;  // ¹«Àû ½Ã°£ ³¡³µÀ¸¸é ÃÊ±âÈ­
+        if (diffTime < 2.0) return;  // ì•„ì§ ë¬´ì  ìƒíƒœë©´ ì¶©ëŒ ê²€ì‚¬ ê±´ë„ˆëœ€
+        else playerRef->isCollision = false;  // ë¬´ì  ì‹œê°„ ëë‚¬ìœ¼ë©´ ì´ˆê¸°í™”
     }
 
-    //¿î¼®-ÇÃ·¹ÀÌ¾î Ãæµ¹ Ã³¸®: 19
+    //ìš´ì„-í”Œë ˆì´ì–´ ì¶©ëŒ ì²˜ë¦¬: 19
     for (int i = 0; i < MAX_METEORS; i++) {
-
-        if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
+        
+        if (item->isItem && item->type == INVINCIBLE_PLAYER) break;
+        
+        else if (CheckCollisionCircles(playerRef->position, PLAYER_SIZE / 2.0f,
             meteors[i].position, meteors[i].radius)) {
-            // ¿î¼®-ÇÃ·¹ÀÌ¾î Ãæµ¹ È¿°úÀ½ Àç»ı
+            // ìš´ì„-í”Œë ˆì´ì–´ ì¶©ëŒ íš¨ê³¼ìŒ ì¬ìƒ
             PlaySound(collisionPlayer);
             GenerateExplosion(playerRef->position, RED);
             playerCollision(playerRef);
             playerRef->lives--;
-            // lives <= 0 ÀÌ¸é °ÔÀÓ ¿À¹ö
+            // lives <= 0 ì´ë©´ ê²Œì„ ì˜¤ë²„
             if (playerRef->lives <= 0) *gameOver = true;
             break;
         }
+        
     }
 }
 
-// ¿î¼® ±×¸®±â
+// ìš´ì„ ê·¸ë¦¬ê¸°
 void DrawMeteors(Meteor* meteors) {
     for (int i = 0; i < MAX_METEORS; i++) {
         DrawCircleV(meteors[i].position, meteors[i].radius, meteors[i].color);
