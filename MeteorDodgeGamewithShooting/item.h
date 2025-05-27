@@ -18,5 +18,4 @@ void InitItem(Item* item);
 void UpdateItem(Item* item, Player* player, bool* meteorFreeze, double* freezeStartTime,
     Sound invincibleSound, Sound getItemSound);
 void DrawItem(Item* item);
-
-void DrawStar(Vector2 center, float radius, int points, Color fillColor, Color outlineColor);
+void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotationAngleDeg, Color color);
