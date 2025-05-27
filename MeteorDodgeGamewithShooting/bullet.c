@@ -3,16 +3,15 @@
 #include "raylib.h"
 
 static int shootCooldown = 0;
-
-//√—æÀ ª˝º∫, player¿« headø°º≠ ª˝º∫µ«∞‘
 void FireBulletOrLaser(Bullet *bullets, Player* playerRef, Item* item, Sound fire) {
 	if (shootCooldown > 0) return;
 
 	PlaySound(fire);
-
 	for (int i = 0; i < MAX_BULLETS; i++) {
 		if (!bullets[i].active) {
 			bullets[i].active = true;
+			bullets[i].isLaser = playerRef->laserMode;
+			//bullets[i].isLaser = false;
 
 			bullets[i].isLaser = item->isItem && (item->type == LASER_GUN) && (GetTime() - item->itemStartTime[1] <= 5.0);
 
@@ -20,13 +19,11 @@ void FireBulletOrLaser(Bullet *bullets, Player* playerRef, Item* item, Sound fir
 
 			bullets[i].position = playerRef->head;
 
-			//«√∑π¿ÃæÓ πÊ«‚¿∏∑Œ ª˝º∫
+			//ÌîåÎ†àÏù¥Ïñ¥ Î∞©Ìñ•ÏúºÎ°ú ÏÉùÏÑ±
 			Vector2 direction = (Vector2){
 				cosf(rad),
 				sinf(rad)
 			};
-
-			//bullets[i].velocity = (Vector2){ direction.x * BULLET_SPEED, direction.y * BULLET_SPEED };
 
 			float speed = bullets[i].isLaser ? LASER_SPEED : BULLET_SPEED;
 
@@ -38,7 +35,7 @@ void FireBulletOrLaser(Bullet *bullets, Player* playerRef, Item* item, Sound fir
 	}
 }
 
-//√—æÀ ¿ßƒ° æ˜µ•¿Ã∆Æ
+//Ï¥ùÏïå ÏúÑÏπò ÏóÖÎç∞Ïù¥Ìä∏
 void UpdateBullets(Bullet* bullets) {
 	if (shootCooldown > 0) shootCooldown--;
 
@@ -47,7 +44,7 @@ void UpdateBullets(Bullet* bullets) {
 			bullets[i].position.x += bullets[i].velocity.x;
 			bullets[i].position.y += bullets[i].velocity.y;
 
-			//»≠∏È π€¿∏∑Œ ≥™∞°∏È ªË¡¶
+			//ÌôîÎ©¥ Î∞ñÏúºÎ°ú ÎÇòÍ∞ÄÎ©¥ ÏÇ≠Ï†ú
 			if (bullets[i].position.x < 0 || bullets[i].position.x > GetScreenWidth()
 				|| bullets[i].position.y < 0 || bullets[i].position.y > GetScreenHeight()) {
 				bullets[i].active = false;
@@ -56,10 +53,9 @@ void UpdateBullets(Bullet* bullets) {
 	}
 }
 
-//√—æÀ ±◊∏Æ±‚
+//Ï¥ùÏïå Í∑∏Î¶¨Í∏∞
 void DrawBullets(Bullet* bullets, Item* item) {
 	for (int i = 0; i < MAX_BULLETS; i++) {
-		
 		if (!bullets[i].active) continue;
 
 		if (bullets[i].isLaser) {

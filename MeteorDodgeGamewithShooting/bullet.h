@@ -11,6 +11,9 @@
 #define LASER_SPEED 30
 #define LASER_LENGTH 5
 
+#define LASER_SPEED 30
+#define LASER_LENGTH 5
+
 typedef struct Bullet {
 	Vector2 position;
 	Vector2 velocity;
@@ -18,7 +21,6 @@ typedef struct Bullet {
 	bool isLaser;
 } Bullet;
 
-//void FireBullet(Bullet* bullets, Player* playerRef);
 void FireBulletOrLaser(Bullet* bullets, Player* playerRef, Item* item, Sound fire);
 void UpdateBullets(Bullet* bullets);
 void DrawBullets(Bullet* bullets, Item * item);

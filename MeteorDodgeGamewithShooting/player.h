@@ -25,6 +25,8 @@ struct Player
 	float size;
 	int lives;
 	int trailIdx;
+	bool laserMode;
+	double laserStartTime;
 }typedef Player;
 
 void InitPlayer(Player *playerRef);

@@ -7,8 +7,8 @@
 
 void InitPlayer(Player* playerRef) {
     playerRef->playerColor = RED;
-    playerRef->position = (Vector2){ 600, 400 };  // ÃÊ±â À§Ä¡
-    playerRef->velocity = (Vector2){ 0, 0 };      // ÃÊ±â ¼Óµµ
+    playerRef->position = (Vector2){ 600, 400 };  // ì´ˆê¸° ìœ„ì¹˜
+    playerRef->velocity = (Vector2){ 0, 0 };      // ì´ˆê¸° ì†ë„
     playerRef->head = (Vector2){ 0, 0 };
     playerRef->angle = 0.0f;
     playerRef->lives = 5;
@@ -29,22 +29,22 @@ void playerCollision(Player* playerRef) {
 void DrawPlayer(Player* playerRef, Item *item) {
     float rad = playerRef->angle * (PI / 180.0f);
 
-    // ÇÃ·¹ÀÌ¾î°¡ ¹Ù¶óº¸´Â À§Ä¡
+    // í”Œë ˆì´ì–´ê°€ ë°”ë¼ë³´ëŠ” ìœ„ì¹˜
     playerRef->head.x = playerRef->position.x + PLAYER_SIZE * cos(rad);
     playerRef->head.y = playerRef->position.y + PLAYER_SIZE * sin(rad);
 
-    // -90µµ ¹æÇâ (¿ŞÂÊ)
+    // -90ë„ ë°©í–¥ (ì™¼ìª½)
     float leftRad = (playerRef->angle - 90.0f) * (PI / 180.0f);
     playerRef->left.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(leftRad);
     playerRef->left.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(leftRad);
 
-    // +90µµ ¹æÇâ (¿À¸¥ÂÊ)
+    // +90ë„ ë°©í–¥ (ì˜¤ë¥¸ìª½)
     float rightRad = (playerRef->angle + 90.0f) * (PI / 180.0f);
     playerRef->right.x = playerRef->position.x + PLAYER_SIZE / 2 * cos(rightRad);
     playerRef->right.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(rightRad);
 
 
-    //Æ®·¹ÀÏ ±×¸®±â
+    //íŠ¸ë ˆì¼ ê·¸ë¦¬ê¸°
     for (int i = 0; i < TRAIL_LENGTH; i++) {
         int idx = (playerRef->trailIdx + i) % TRAIL_LENGTH;
         float trace = (float)i / TRAIL_LENGTH;
@@ -53,7 +53,7 @@ void DrawPlayer(Player* playerRef, Item *item) {
     }
 
 
-    //########## ÇÃ·¹ÀÌ¾î ±ôºıÀÓ Ã³¸® #########//
+    //########## í”Œë ˆì´ì–´ ê¹œë¹¡ì„ ì²˜ë¦¬ #########//
 
     if (playerRef->isCollision == true && !(item->isItem && item->type == INVINCIBLE_PLAYER)) {
         double diffTime = GetTime() - playerRef->deathTime;
@@ -85,7 +85,7 @@ void DrawPlayer(Player* playerRef, Item *item) {
             double currentTime = GetTime();
             double blinkInterval = 0.1; 
 
-            // ÀÏÁ¤ ½Ã°£ °æ°ú ½Ã ´ÙÀ½ »ö»óÀ¸·Î ÀüÈ¯
+            // ì¼ì • ì‹œê°„ ê²½ê³¼ ì‹œ ë‹¤ìŒ ìƒ‰ìƒìœ¼ë¡œ ì „í™˜
             if (currentTime - lastColorChangeTime > blinkInterval) {
                 currentColorIndex = (currentColorIndex + 1) % rainbowCount;
                 lastColorChangeTime = currentTime;
@@ -141,7 +141,7 @@ void UpdatePlayer(Player* playerRef, Item* item) {
     float turnspeed = 360.0;
     float maxspeed = 10.0f;
 
-    // Á×°í 1ÃÊ°£ Á¶ÀÛ Á¦ÇÑ
+    // ì£½ê³  1ì´ˆê°„ ì¡°ì‘ ì œí•œ
     bool canMove = true;
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
@@ -154,11 +154,11 @@ void UpdatePlayer(Player* playerRef, Item* item) {
         return;
     }
 
-    // È¸Àü
+    // íšŒì „
     if (IsKeyDown(KEY_LEFT))  playerRef->angle -= turnspeed * deltaTime;
     if (IsKeyDown(KEY_RIGHT)) playerRef->angle += turnspeed * deltaTime;
 
-    // ¼Óµµ Áõ°¡
+    // ì†ë„ ì¦ê°€
     float acceleration = 0.0f;
     if (IsKeyDown(KEY_UP)) {
         acceleration = PLAYER_ACCEL;
@@ -168,35 +168,30 @@ void UpdatePlayer(Player* playerRef, Item* item) {
         playerRef->velocity.y *= PLAYER_FRICTION;
     }
 
-    // ¹æÇâ °è»ê
+    // ë°©í–¥ ê³„ì‚°
     Vector2 direction = {
         cosf(playerRef->angle * rad),
         sinf(playerRef->angle * rad)
     };
 
-    // ¼Óµµ ¾÷µ¥ÀÌÆ®
+    // ì†ë„ ì—…ë°ì´íŠ¸
     playerRef->velocity.x += direction.x * acceleration;
     playerRef->velocity.y += direction.y * acceleration;
 
-    // ¼Óµµ Á¦ÇÑ
+    // ì†ë„ ì œí•œ
     float speed = Vector2Length(playerRef->velocity);
     if (speed > maxspeed) {
         playerRef->velocity = Vector2Scale(Vector2Normalize(playerRef->velocity), maxspeed);
     }
 
-    // À§Ä¡ ¾÷µ¥ÀÌÆ®
+    // ìœ„ì¹˜ ì—…ë°ì´íŠ¸
     playerRef->position.x += playerRef->velocity.x;
     playerRef->position.y += playerRef->velocity.y;
 
-    //Æ®·¹ÀÏ À§Ä¡ ÀúÀå
+    //íŠ¸ë ˆì¼ ìœ„ì¹˜ ì €ì¥
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
 
-    /*
-    if (item->type == LASER_GUN && item->isItem) {
-        item->isItem = false;
-    }
-    */
 
     ScreenRestrictPlayer(playerRef);
 }
