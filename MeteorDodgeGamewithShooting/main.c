@@ -200,6 +200,7 @@ int main(void)
         else if (IsKeyPressed(KEY_ENTER)) {
             InitPlayer(&player);
             InitMeteors(meteors);
+            InitItem(&item);
             // 총알 전부 비활성화
             for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
             // 충돌 파티클 비활성화
