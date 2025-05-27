@@ -20,6 +20,6 @@ typedef struct Item {
 } Item;
 
 void InitItem(Item* item);
-void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound);
+void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound, Music gameSceneMusic);
 void DrawItem(Item* item);
 void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotationAngleDeg, Color color);

@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "meteor.h"
+#include "player.h"
+#include "bullet.h"
 
 #define ITEM_RADIUS 15
 #define ITEM_VISIBLE_DURATION 5.0     // 아이템이 유지되는 시간 (초)
@@ -19,7 +22,7 @@ void InitItem(Item* item) {
     for (int i = 0; i < 3; i++) item->itemStartTime[i] = 0;
 }
 
-void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound) {
+void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound, Music gameSceneMusic) {
     double currentTime = GetTime();
 
     //운석 일시정지 아이템
@@ -66,12 +69,16 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
             case STOP_METEOR:
                 item->itemStartTime[0] = currentTime;
                 PlaySound(getItemSound);
+                break;
             case LASER_GUN:
                 item->itemStartTime[1] = currentTime;
                 PlaySound(getItemSound);
+                break;
             case INVINCIBLE_PLAYER:
                 item->itemStartTime[2] = currentTime;
+                StopMusicStream(gameSceneMusic);
                 PlaySound(invincibleSound);
+                break;
             default:
                 break;
             }
@@ -79,6 +86,18 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
             item->isItem = true;
             item->active = false;
             lastInactiveTime = currentTime;
+        }
+    }
+
+    // 플레이어 무적 아이템을 얻은 이후 시간 계산
+    if (!item->active && item->isItem && item->type == INVINCIBLE_PLAYER) {
+        // 5초 지났을 경우 효과음 종료
+        if (currentTime - item->itemStartTime[2] >= INVINCIBLE_TIME) {
+            StopSound(invincibleSound);
+            // 멈춰뒀던 게임 음악 플레이
+            if (!IsMusicStreamPlaying(gameSceneMusic)) {
+                PlayMusicStream(gameSceneMusic);
+            }
         }
     }
 }

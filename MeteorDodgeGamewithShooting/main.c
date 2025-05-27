@@ -181,11 +181,10 @@ int main(void)
 
 
             //아이템 업데이트
-            UpdateItem(&item, &player, invincibleSound, getItemSound);
+            UpdateItem(&item, &player, invincibleSound, getItemSound, gameSceneMusic);
 
             //bgm 재생 및 스트리밍
-            if (!IsMusicStreamPlaying(gameSceneMusic)) {
-                StopMusicStream(gameSceneMusic);
+            if (!IsMusicStreamPlaying(gameSceneMusic) && (!item.isItem || item.type != INVINCIBLE_PLAYER)) {
                 PlayMusicStream(gameSceneMusic);
             }
             UpdateMusicStream(gameSceneMusic);
