@@ -9,13 +9,14 @@
 
 #define ITEM_RADIUS 15
 #define ITEM_VISIBLE_DURATION 5.0     // 아이템이 유지되는 시간 (초)
-#define ITEM_RESPAWN_DELAY 10.0       // 아이템이 사라진 후 다시 나타날 때까지의 대기 시간 (초)
+#define ITEM_RESPAWN_DELAY 5.0       // 아이템이 사라진 후 다시 나타날 때까지의 대기 시간 (초)
 
 static double itemActiveTime = 0.0;   // 아이템이 나타난 시점
 static double lastInactiveTime = 0.0; // 아이템이 사라진 시점
 
 void InitItem(Item* item) {
     item->active = false;
+    item->isItem = false;
     item->position = (Vector2){ 0, 0 };
     itemActiveTime = 0;
     lastInactiveTime = GetTime();  // 시작할 때 비활성화로 시작
@@ -25,29 +26,25 @@ void InitItem(Item* item) {
 void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound, Music gameSceneMusic) {
     double currentTime = GetTime();
 
-    //운석 일시정지 아이템
-    // 아이템이 비활성 상태일 때, 일정 시간이 지나면 다시 생성
-    if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
+    // 아이템이 비활성 상태이고, 아이템 효과도 끝났다면, 일정 시간 이후 다시 생성
+    if (!item->active && !item->isItem && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
         item->active = true;
         item->position = (Vector2){ 200 + rand() % 800, 100 + rand() % 600 };
         //아이템 랜덤 생성
         int itemIdx = rand() % 3;
-        
-        switch (itemIdx)
-        {
-        case 0:
-            item->type = STOP_METEOR;
+
+        switch (itemIdx) {
+        case 0: 
+            item->type = STOP_METEOR; 
             break;
-        case 1:
-            item->type = LASER_GUN;
+        case 1: 
+            item->type = LASER_GUN; 
             break;
-        case 2:
-            item->type = INVINCIBLE_PLAYER;
-            break;
-        default:
+        case 2: 
+            item->type = INVINCIBLE_PLAYER; 
             break;
         }
-        
+
         itemActiveTime = currentTime;
     }
 
@@ -57,13 +54,12 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
         if (currentTime - itemActiveTime >= ITEM_VISIBLE_DURATION) {
             item->active = false;
             lastInactiveTime = currentTime;
+            item->isItem = false; // 아직 사용 안 했으므로 효과도 없음
             return;
         }
-        lastInactiveTime = currentTime;
 
         // 플레이어가 아이템을 먹었는지 확인
         if (CheckCollisionCircles(player->position, PLAYER_SIZE / 2.0f, item->position, ITEM_RADIUS)) {
-
             switch (item->type)
             {
             case STOP_METEOR:
@@ -82,22 +78,37 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
             default:
                 break;
             }
-            
+
             item->isItem = true;
             item->active = false;
-            lastInactiveTime = currentTime;
         }
     }
 
-    // 플레이어 무적 아이템을 얻은 이후 시간 계산
-    if (!item->active && item->isItem && item->type == INVINCIBLE_PLAYER) {
-        // 5초 지났을 경우 효과음 종료
-        if (currentTime - item->itemStartTime[2] >= INVINCIBLE_TIME) {
+    // 아이템 효과 지속 체크
+    if (item->isItem) {
+
+        // 플레이어 무적 아이템을 얻은 이후 시간 계산
+        if (item->type == INVINCIBLE_PLAYER && currentTime - item->itemStartTime[2] >= INVINCIBLE_TIME) {
+            // 5초 지났을 경우 효과음 종료
             StopSound(invincibleSound);
             // 멈춰뒀던 게임 음악 플레이
             if (!IsMusicStreamPlaying(gameSceneMusic)) {
                 PlayMusicStream(gameSceneMusic);
             }
+            item->isItem = false;
+            lastInactiveTime = currentTime; // 아이템 효과가 끝났으므로, 여기서부터 respawn 시간 카운트
+        }
+
+        // 운석 정지 아이템 체크
+        if (item->type == STOP_METEOR && currentTime - item->itemStartTime[0] >= STOPMETEOR_TIME) {
+            item->isItem = false;
+            lastInactiveTime = currentTime;
+        }
+
+        // 레이저 아이템 체크
+        if (item->type == LASER_GUN && currentTime - item->itemStartTime[1] >= LASER_TIME) {
+            item->isItem = false;
+            lastInactiveTime = currentTime;
         }
     }
 }
