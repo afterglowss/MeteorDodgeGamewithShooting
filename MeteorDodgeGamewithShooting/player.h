@@ -5,7 +5,7 @@
 #define PLAYER_FRICTION 0.9f
 #define TRAIL_LENGTH 20
 #define ROTATE_LERP_FACTOR 0.15f
-#define INVINCIBLE_TIME 3
+#define INVINCIBLE_TIME 5
 
 #include "raylib.h"
 #include "raymath.h"

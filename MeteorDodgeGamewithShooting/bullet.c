@@ -12,8 +12,8 @@ void FireBulletOrLaser(Bullet *bullets, Player* playerRef, Item* item, Sound fir
 			bullets[i].active = true;
 			bullets[i].isLaser = playerRef->laserMode;
 
-			bullets[i].isLaser = item->isItem && (item->type == LASER_GUN) && (GetTime() - item->itemStartTime[1] <= 5.0);
-			if (GetTime() - item->itemStartTime[1] > 5.0)
+			bullets[i].isLaser = item->isItem && (item->type == LASER_GUN) && (GetTime() - item->itemStartTime[1] <= LASER_TIME);
+			if (GetTime() - item->itemStartTime[1] > LASER_TIME)
 				item->isItem = false;
 
 			float rad = playerRef->angle * (PI / 180.0f);

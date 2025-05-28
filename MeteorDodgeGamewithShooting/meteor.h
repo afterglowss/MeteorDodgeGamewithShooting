@@ -9,7 +9,8 @@
 #include "item.h"
 
 #define MAX_METEORS 40
-#define minBright 100
+#define MIN_BRIGHT 100
+#define STOPMETEOR_TIME 5
 
 extern int highScore;
 
