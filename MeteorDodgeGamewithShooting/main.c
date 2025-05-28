@@ -73,6 +73,12 @@ int main(void)
     {
         if (gameStarted && IsKeyPressed(KEY_BACKSPACE)) {
             gameStarted = false;
+
+            // 재생되고 있을 수 있는 효과음 전부 종료
+            if (IsSoundPlaying(gameOverSound)) StopSound(gameOverSound);
+            if (IsSoundPlaying(getItemSound)) StopSound(getItemSound);
+            if (IsSoundPlaying(invincibleSound)) StopSound(invincibleSound);
+
             continue;
         }
         //게임 시작 전
@@ -181,11 +187,10 @@ int main(void)
 
 
             //아이템 업데이트
-            UpdateItem(&item, &player, invincibleSound, getItemSound);
+            UpdateItem(&item, &player, invincibleSound, getItemSound, gameSceneMusic);
 
             //bgm 재생 및 스트리밍
-            if (!IsMusicStreamPlaying(gameSceneMusic)) {
-                StopMusicStream(gameSceneMusic);
+            if (!IsMusicStreamPlaying(gameSceneMusic) && (!item.isItem || item.type != INVINCIBLE_PLAYER)) {
                 PlayMusicStream(gameSceneMusic);
             }
             UpdateMusicStream(gameSceneMusic);
@@ -209,6 +214,10 @@ int main(void)
             score = 0;
             gameOver = false;
             gameOverSoundPlayed = false;
+
+            // 재생되고 있을 수 있는 효과음 전부 종료
+            if (IsSoundPlaying(gameOverSound)) StopSound(gameOverSound);
+            if (IsSoundPlaying(getItemSound)) StopSound(getItemSound);
         }
 
         BeginDrawing();
