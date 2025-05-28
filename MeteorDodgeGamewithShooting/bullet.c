@@ -11,9 +11,10 @@ void FireBulletOrLaser(Bullet *bullets, Player* playerRef, Item* item, Sound fir
 		if (!bullets[i].active) {
 			bullets[i].active = true;
 			bullets[i].isLaser = playerRef->laserMode;
-			//bullets[i].isLaser = false;
 
 			bullets[i].isLaser = item->isItem && (item->type == LASER_GUN) && (GetTime() - item->itemStartTime[1] <= 5.0);
+			if (GetTime() - item->itemStartTime[1] > 5.0)
+				item->isItem = false;
 
 			float rad = playerRef->angle * (PI / 180.0f);
 
@@ -60,7 +61,6 @@ void DrawBullets(Bullet* bullets, Item* item) {
 
 		if (bullets[i].isLaser) {
 			DrawLineEx(bullets[i].position, GetLaserEndPos(&bullets[i]), 3.0f, ORANGE);
-			item->isItem = false;
 		}
 		else
 		{
