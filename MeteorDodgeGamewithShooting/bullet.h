@@ -13,6 +13,7 @@
 
 #define LASER_SPEED 30
 #define LASER_LENGTH 5
+#define LASER_TIME 5
 
 typedef struct Bullet {
 	Vector2 position;

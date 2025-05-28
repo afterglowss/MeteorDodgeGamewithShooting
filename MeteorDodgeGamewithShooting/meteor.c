@@ -12,9 +12,9 @@ void RespawnMeteor(Meteor* m, int index) {
 
     // 무작위 색상 저장(밝게)
     m->color = (Color){
-    minBright + rand() % (256 - minBright),
-    minBright + rand() % (256 - minBright),
-    minBright + rand() % (256 - minBright),
+    MIN_BRIGHT + rand() % (256 - MIN_BRIGHT),
+    MIN_BRIGHT + rand() % (256 - MIN_BRIGHT),
+    MIN_BRIGHT + rand() % (256 - MIN_BRIGHT),
     255
     };
 
@@ -63,7 +63,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* sco
     double currentTime = GetTime();
 
   
-    bool freezeActive = item->isItem && (item->type == STOP_METEOR) && (currentTime - item->itemStartTime[0] <= 3.0);
+    bool freezeActive = item->isItem && (item->type == STOP_METEOR) && (currentTime - item->itemStartTime[0] <= STOPMETEOR_TIME);
 
     for (int i = 0; i < MAX_METEORS; i++) {
         if (!freezeActive) {
@@ -123,7 +123,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* sco
     // 플레이어 무적 상태일 경우 충돌 검사 무시
     if (playerRef->isCollision) {
         double diffTime = GetTime() - playerRef->deathTime;
-        if (diffTime < 2.0) return;  // 아직 무적 상태면 충돌 검사 건너뜀
+        if (diffTime < INVINCIBLE_TIME) return;  // 아직 무적 상태면 충돌 검사 건너뜀
         else playerRef->isCollision = false;  // 무적 시간 끝났으면 초기화
     }
 
