@@ -9,10 +9,11 @@
 
 #define ITEM_RADIUS 15
 #define ITEM_VISIBLE_DURATION 5.0     // 아이템이 유지되는 시간 (초)
-#define ITEM_RESPAWN_DELAY 10.0       // 아이템이 사라진 후 다시 나타날 때까지의 대기 시간 (초)
+#define ITEM_RESPAWN_DELAY 5.0       // 아이템이 사라진 후 다시 나타날 때까지의 대기 시간 (초)
 
 static double itemActiveTime = 0.0;   // 아이템이 나타난 시점
 static double lastInactiveTime = 0.0; // 아이템이 사라진 시점
+static double itemLastTime = 0.0;     // 아이템 지속 시간
 
 void InitItem(Item* item) {
     item->active = false;
@@ -25,14 +26,14 @@ void InitItem(Item* item) {
 void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound, Music gameSceneMusic) {
     double currentTime = GetTime();
 
-    //운석 일시정지 아이템
     // 아이템이 비활성 상태일 때, 일정 시간이 지나면 다시 생성
-    if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY)) {
+    if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY + itemLastTime)) {
+        itemLastTime = 0;
         item->active = true;
         item->position = (Vector2){ 200 + rand() % 800, 100 + rand() % 600 };
         //아이템 랜덤 생성
         int itemIdx = rand() % 3;
-        
+
         switch (itemIdx)
         {
         case 0:
@@ -47,7 +48,7 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
         default:
             break;
         }
-        
+
         itemActiveTime = currentTime;
     }
 
@@ -68,21 +69,24 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
             {
             case STOP_METEOR:
                 item->itemStartTime[0] = currentTime;
+                itemLastTime = STOPMETEOR_TIME;
                 PlaySound(getItemSound);
                 break;
             case LASER_GUN:
                 item->itemStartTime[1] = currentTime;
+                itemLastTime = LASER_TIME;
                 PlaySound(getItemSound);
                 break;
             case INVINCIBLE_PLAYER:
                 item->itemStartTime[2] = currentTime;
+                itemLastTime = INVINCIBLE_TIME;
                 StopMusicStream(gameSceneMusic);
                 PlaySound(invincibleSound);
                 break;
             default:
                 break;
             }
-            
+
             item->isItem = true;
             item->active = false;
             lastInactiveTime = currentTime;
