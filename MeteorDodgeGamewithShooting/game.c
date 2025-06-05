@@ -10,6 +10,7 @@ Vector2 RandomDirection() {
 }
 
 void GenerateExplosion(Vector2 position, Color color) {
+    // 충돌 시 최대 생성 파편 수만큼 파편 생성, 방향은 랜덤으로 색상은 정해서
     for (int i = 0, spawned = 0; i < MAX_PARTICLES && spawned < PARTICLE_PER_EXPLOSION; i++) {
         if (!particles[i].active) {
             particles[i].position = position;
@@ -21,7 +22,7 @@ void GenerateExplosion(Vector2 position, Color color) {
         }
     }
 }
-
+// 파편 위치 업데이트
 void UpdateParticles() {
     for (int i = 0; i < MAX_PARTICLES; i++) {
         if (particles[i].active) {
@@ -30,7 +31,7 @@ void UpdateParticles() {
         }
     }
 }
-
+// 파편 화면에 그리기
 void DrawParticles() {
     for (int i = 0; i < MAX_PARTICLES; i++) {
         if (particles[i].active) {
@@ -39,8 +40,11 @@ void DrawParticles() {
         }
     }
 }
-
-void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, const char** menuItems, int menuCount) {
+// 게임 상황에 맞춰 UI 그리기
+void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selectedMenu, 
+    const char** menuItems, int menuCount, Sound gameOverSound, bool *gameOverSoundPlayed) {
+    
+    // 시작 전 메인화면 그리기
     if (!gameStarted) {
         DrawText("Meteor Dodge Game", 405, 200, 40, WHITE);
         DrawText("with Shooting", 460, 240, 40, WHITE);
@@ -49,11 +53,16 @@ void DrawUI(Player player, int score, bool gameOver, bool gameStarted, int selec
             DrawText(menuItems[i], 540, 350 + i * 40, 30, color);
         }
     }
+    // 게임이 시작된 동안 필요한 UI 출력
     else {
         DrawText(TextFormat("Lives: %d", player.lives), 10, 10, 20, WHITE);
         DrawText(TextFormat("Score: %d", score), 10, 35, 20, YELLOW);
-
+        // 게임오버 시 게임오버 화면 출력
         if (gameOver) {
+            if (!(*gameOverSoundPlayed)) {
+                PlaySound(gameOverSound);
+                *gameOverSoundPlayed = true;
+            }
             DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.75f));
             DrawText("GAME OVER", 460, 330, 40, RED);
             DrawText(TextFormat("HIGHSCORE: %d", highScore), 450, 375, 30, YELLOW);
