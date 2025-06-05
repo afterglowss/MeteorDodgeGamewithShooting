@@ -16,10 +16,13 @@ void InitPlayer(Player* playerRef) {
     playerRef->trailIdx = 0;
 }
 
-void playerCollision(Player* playerRef) {
+void PlayerCollision(Player* playerRef) {
+    // 충돌 시 중심에서 재생성
     playerRef->position = (Vector2){ 600 , 400 };
+    // 죽은 시간 저장
     playerRef->deathTime = GetTime();
     playerRef->isCollision = true;
+    // 플레이어 잔상 모두 삭제
     for (int i = 0; i < TRAIL_LENGTH; i++) {
         playerRef->trail[i] = (Vector2){ 0, 0 };
     }
@@ -44,7 +47,7 @@ void DrawPlayer(Player* playerRef, Item *item) {
     playerRef->right.y = playerRef->position.y + PLAYER_SIZE / 2 * sin(rightRad);
 
 
-    //트레일 그리기
+    // 잔상 그리기
     for (int i = 0; i < TRAIL_LENGTH; i++) {
         int idx = (playerRef->trailIdx + i) % TRAIL_LENGTH;
         float trace = (float)i / TRAIL_LENGTH;
@@ -53,27 +56,27 @@ void DrawPlayer(Player* playerRef, Item *item) {
     }
 
 
-    //########## 플레이어 깜빡임 처리 #########//
-
+    // 플레이어 깜빡임 처리 
     if (playerRef->isCollision == true && !(item->isItem && item->type == INVINCIBLE_PLAYER)) {
+        // 사망 시점부터 달라진 시간 계산
         double diffTime = GetTime() - playerRef->deathTime;
+        // 2초가 안 지났다면 깜빡이기
         if (diffTime < 2) {
             if (fmod(diffTime, 0.4) < 0.2) {
                 DrawCircleV(playerRef->position, 5.0f, RED);
                 DrawTriangle(playerRef->head, playerRef->left, playerRef->right, RED);
             }
-            else {
-            }
         }
+        // 2초가 지났다면 충돌 상태 false
         else {
             playerRef->isCollision = false;
         }
-        DrawText(TextFormat("%.2f", diffTime), 10, 10, 20, RED);
     }
+    // 플레이어가 먹은 아이템이 무적 아이템일 경우
     else if (item->isItem && item->type == INVINCIBLE_PLAYER) {
         double diffTime = GetTime() - item->itemStartTime[2];
         if (diffTime < INVINCIBLE_TIME) {
-
+            // 무지개로 빛나기
             Color rainbowColors[] = {
                 RED, ORANGE, YELLOW, GREEN, BLUE, DARKBLUE, PURPLE
             };
@@ -93,17 +96,17 @@ void DrawPlayer(Player* playerRef, Item *item) {
             playerRef->playerColor = rainbowColors[currentColorIndex];
             DrawCircleV(playerRef->position, 5.0f, playerRef->playerColor);
             DrawTriangle(playerRef->head, playerRef->left, playerRef->right, playerRef->playerColor);
-
         }
-        else
-            item->isItem = false;
+        else item->isItem = false;
     }
+    // 무적 아이템을 먹은 상태가 아니라면 일반적인 붉은색 원에 삼각형 그리기
     else {
         DrawCircleV(playerRef->position, 5.0f, RED);
         DrawTriangle(playerRef->head, playerRef->left, playerRef->right, RED);
     }
 }
 
+// 플레이어가 화면 바깥으로 나가지 않도록 제한
 void ScreenRestrictPlayer(Player* playerRef) {
     float rad = playerRef->angle * (PI / 180.0f);
 
@@ -124,6 +127,7 @@ void ScreenRestrictPlayer(Player* playerRef) {
 
     Vector2* points[] = { &head, &left, &right };
 
+    // head, left, right 각각 화면을 나갈 수 없도록 수정
     for (int i = 0; i < 3; i++) {
         Vector2* p = points[i];
 
@@ -149,16 +153,17 @@ void UpdatePlayer(Player* playerRef, Item* item) {
             canMove = false;
         }
     }
+    //움직일 수 없다면 속도 제한 이후 return 
     if (!canMove) {
         playerRef->velocity = (Vector2){ 0, 0 };
         return;
     }
 
-    // 회전
+    // 왼쪽, 오른쪽 방향키 입력시 해당 방향으로 회전
     if (IsKeyDown(KEY_LEFT))  playerRef->angle -= turnspeed * deltaTime;
     if (IsKeyDown(KEY_RIGHT)) playerRef->angle += turnspeed * deltaTime;
 
-    // 속도 증가
+    // 가속도 고려해서 이동속도 증가
     float acceleration = 0.0f;
     if (IsKeyDown(KEY_UP)) {
         acceleration = PLAYER_ACCEL;
@@ -188,10 +193,10 @@ void UpdatePlayer(Player* playerRef, Item* item) {
     playerRef->position.x += playerRef->velocity.x;
     playerRef->position.y += playerRef->velocity.y;
 
-    //트레일 위치 저장
+    // 트레일 위치 저장
     playerRef->trail[playerRef->trailIdx] = playerRef->position;
     playerRef->trailIdx = (playerRef->trailIdx + 1) % TRAIL_LENGTH;
 
-
+    // 화면을 나가는지 계속 확인
     ScreenRestrictPlayer(playerRef);
 }
