@@ -12,68 +12,78 @@ int main(void)
     // 오디오 초기화
     InitAudioDevice();
 
-    //메인 화면 bgm
+    // 메인 화면 bgm
     Music mainSceneMusic = LoadMusicStream("resources/mainSceneMusic.wav");
     SetMusicVolume(mainSceneMusic, 1.0f);
-    //게임 화면 bgm
+    // 게임 화면 bgm
     Music gameSceneMusic = LoadMusicStream("resources/gameSceneMusic.wav");
     SetMusicVolume(gameSceneMusic, 1.0f);
-    //총알 발사 sound
+    // 총알 발사 sound
     Sound fireSound = LoadSound("resources/fire.wav");
     SetSoundVolume(fireSound, 0.1f);
-    //게임 오버 sound
+    // 게임 오버 sound
     Sound gameOverSound = LoadSound("resources/gameOver.wav");
     SetSoundVolume(gameOverSound, 1.0f);
-    //메뉴 이동 sound
+    // 메뉴 이동 sound
     Sound menuSound = LoadSound("resources/menu.wav");
     SetSoundVolume(menuSound, 0.3f);
-    //운석-플레이어 충돌 sound
+    // 운석-플레이어 충돌 sound
     Sound collisionPlayerSound = LoadSound("resources/collisionPlayer.wav");
     SetSoundVolume(collisionPlayerSound, 0.2f);
-    //운석-총알 충돌 sound
+    // 운석-총알 충돌 sound
     Sound collisionBulletSound = LoadSound("resources/collisionBullet.wav");
     SetSoundVolume(collisionBulletSound, 0.2f);
-    //레이저
+    // 레이저
     Sound laserSound = LoadSound("resources/laser.wav");
     SetSoundVolume(laserSound, 0.1f);
-    //무적
+    // 무적
     Sound invincibleSound = LoadSound("resources/invincible.wav");
     SetSoundVolume(invincibleSound, 0.5f);
-    //아이템 획득 (운석 정지, 레이저 아이템 획득 시 적용)
+    // 아이템 획득 (운석 정지, 레이저 아이템 획득 시 적용)
     Sound getItemSound = LoadSound("resources/getItem.wav");
     SetSoundVolume(getItemSound, 0.5f);
 
-
+    // 플레이어 초기화
     Player player;
     InitPlayer(&player);
 
+    // 운석 초기화
     Meteor meteors[MAX_METEORS];
     InitMeteors(meteors);
 
+    // 총알 배열 초기화
     Bullet bullets[MAX_BULLETS] = { 0 };
 
-    //아이템 추가
+    // 아이템 초기화
     Item item;
     InitItem(&item);
+
+    // 아이템 변수 초기화
     bool meteorFreeze = false;
     double freezeStartTime = 0.0;
 
-    //사운드 관련 flag
+    // 사운드 관련 flag
     bool gameOverSoundPlayed = false;
 
+    // 게임 상태 관리 변수 초기화
     bool gameStarted = false;
     bool gameOver = false;
+
+    // 메뉴
     int selectedMenu = 0;
     const char* menuItems[] = { "Start", "Score", "Credits", "Exit" };
     const int menuCount = 4;
 
+    // 현재 점수 초기화
     int score = 0;
 
+    // 프로그램 실행 반복문 (esc 버튼 누르기 전까지 계속 반복)
     while (!WindowShouldClose())
     {
+        // 게임이 시작된 상태에서 BackSpace를 눌렀을 경우
         if (gameStarted && IsKeyPressed(KEY_BACKSPACE)) {
+            // 게임 종료 (메뉴로 돌아가기)
             gameStarted = false;
-
             // 재생되고 있을 수 있는 효과음 전부 종료
             if (IsSoundPlaying(gameOverSound)) StopSound(gameOverSound);
             if (IsSoundPlaying(getItemSound)) StopSound(getItemSound);
@@ -81,20 +91,24 @@ int main(void)
 
             continue;
         }
-        //게임 시작 전
+        // 게임 시작 전 메인화면
         if (!gameStarted) {
+            // 프레임 시작 raylib 함수
             BeginDrawing();
             ClearBackground(BLACK);
+            // UI 그리기
             DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems,
                 menuCount, gameOverSound, &gameOverSoundPlayed);
             EndDrawing();
 
+            //메인 화면 bgm 스트리밍
             if (!IsMusicStreamPlaying(mainSceneMusic)) {
                 PlayMusicStream(mainSceneMusic);
             }
-            //메인 화면 bgm 지속해서 스트리밍
+            // 메인 화면 bgm 지속해서 스트리밍
             UpdateMusicStream(mainSceneMusic);
 
+            // 메뉴 이동
             if (IsKeyPressed(KEY_DOWN)) {
                 PlaySound(menuSound);
                 selectedMenu = (selectedMenu + 1) % menuCount;
@@ -103,28 +117,27 @@ int main(void)
                 PlaySound(menuSound);
                 selectedMenu = (selectedMenu - 1 + menuCount) % menuCount;
             }
+
             // 메뉴 중 하나를 고른 경우
             else if (IsKeyPressed(KEY_ENTER)) {
                 // Start 버튼 Enter
                 if (selectedMenu == 0) {
-                    // 게임 시작 상황
+                    // 게임 시작 상태 표시
                     gameStarted = true;
-                    // 플레이어 초기화
+                    // 필요 구조체 전부 초기화
                     InitPlayer(&player);
-                    // 운석 초기화
                     InitMeteors(meteors);
-
-                    //아이템 초기화
                     InitItem(&item);
 
                     // 총알 전부 비활성화
                     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
                     // 충돌 파티클 비활성화
                     for (int i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
-                    // 총알 쿨타임, 점수, 점수에 따른 운석 속도 초기화 (=0) 필요
+                    // 현재 점수 초기화
                     score = 0;
+                    //게임 상태 변경
                     gameOver = false;
-                    //게임 오버 사운드 재생 여부 판단에 필요한 flag false
+                    // 게임 오버 사운드 재생 여부 판단에 필요한 flag false
                     gameOverSoundPlayed = false;
 
                 }
@@ -143,7 +156,7 @@ int main(void)
                         DrawText(TextFormat("High Score: %d", highScore), 450, 360, 30, YELLOW);
                         DrawText("Press ENTER to return", 430, 420, 20, LIGHTGRAY);
                         EndDrawing();
-                        // 엔터 치면 이전 메뉴로 돌아가기
+                        // 엔터 치면 메뉴로 돌아가기
                         if (IsKeyPressed(KEY_ENTER)) break;
                     }
                 }
@@ -178,25 +191,24 @@ int main(void)
         }
         // 게임은 시작이 됐고, game over 는 아닐 경우
         if (!gameOver) {
-            // 반복문 안에서 Update 함수 계속 호출
+            // 반복문 안에서 각 객체 Update 함수 계속 호출
             UpdatePlayer(&player, &item);
             UpdateBullets(bullets);
             UpdateMeteors(meteors, &player, bullets, &score, &gameOver,
                 &item, collisionBulletSound, collisionPlayerSound);
             UpdateParticles();
 
-
-            //아이템 업데이트
+            // 아이템 업데이트
             UpdateItem(&item, &player, invincibleSound, getItemSound, gameSceneMusic);
 
-            //bgm 재생 및 스트리밍
+            // bgm 재생 및 스트리밍 (단, 무적 아이템 획득 시 잠깐 멈추기)
             if (!IsMusicStreamPlaying(gameSceneMusic) && (!item.isItem || item.type != INVINCIBLE_PLAYER)) {
                 PlayMusicStream(gameSceneMusic);
             }
             UpdateMusicStream(gameSceneMusic);
 
             if (IsKeyDown(KEY_SPACE)) {
-                //if (!IsSoundPlaying(fire)) PlaySound(fire);
+                // if (!IsSoundPlaying(fire)) PlaySound(fire);
                 FireBulletOrLaser(bullets, &player, &item, fireSound);
             }
         }
@@ -222,14 +234,16 @@ int main(void)
 
         BeginDrawing();
         ClearBackground(BLACK);
+
+        // 지속적으로 화면에 그리기
         DrawPlayer(&player,&item);
         DrawMeteors(meteors);
         DrawBullets(bullets, &item);
+        DrawParticles();
 
-        //아이템 그리기
+        // 아이템 그리기
         DrawItem(&item);
 
-        DrawParticles();
         DrawUI(player, score, gameOver, gameStarted, selectedMenu, menuItems,
             menuCount, gameOverSound, &gameOverSoundPlayed);
         EndDrawing();

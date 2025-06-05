@@ -3,7 +3,7 @@
 #include "game.h"
 
 int highScore = 0;
-int checkScore = 0;
+int checkScore = 0;         // 1000점마다 운석 속도를 올리기 위한
 float speed;
 
 // 무작위 운석 생성 함수
@@ -57,7 +57,7 @@ void InitMeteors(Meteor* meteors) {
     }
 }
 
-//운석 위치 업데이트-17
+//운석 위치 업데이트
 void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* score, bool* gameOver,
     Item* item, Sound collisionBullet, Sound collisionPlayer) {
     double currentTime = GetTime();
@@ -70,14 +70,14 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* sco
             meteors[i].position.x += meteors[i].velocity.x;
             meteors[i].position.y += meteors[i].velocity.y;
         }
-
+        // 화면 바깥 +100만큼 나가면 운석 삭제
         if (meteors[i].position.x < -100 || meteors[i].position.x > SCREEN_WIDTH + 100 ||
             meteors[i].position.y < -100 || meteors[i].position.y > SCREEN_HEIGHT + 100) {
             RespawnMeteor(&meteors[i], i);  // 삭제된 meteor 재사용
         }
     }
 
-    //운석-총알 충돌 처리: 20
+    //운석-총알 충돌 처리
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!bullets[i].active) continue;
 
@@ -127,7 +127,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* sco
         else playerRef->isCollision = false;  // 무적 시간 끝났으면 초기화
     }
 
-    //운석-플레이어 충돌 처리: 19
+    //운석-플레이어 충돌 처리
     for (int i = 0; i < MAX_METEORS; i++) {
         
         if (item->isItem && item->type == INVINCIBLE_PLAYER) break;
@@ -137,7 +137,7 @@ void UpdateMeteors(Meteor* meteors, Player* playerRef, Bullet* bullets, int* sco
             // 운석-플레이어 충돌 효과음 재생
             PlaySound(collisionPlayer);
             GenerateExplosion(playerRef->position, RED);
-            playerCollision(playerRef);
+            PlayerCollision(playerRef);
             playerRef->lives--;
             // lives <= 0 이면 게임 오버
             if (playerRef->lives <= 0) *gameOver = true;

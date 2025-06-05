@@ -24,14 +24,19 @@ void InitItem(Item* item) {
 }
 
 void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItemSound, Music gameSceneMusic) {
+    
+    // 프레임마다 현재 시간 저장
     double currentTime = GetTime();
 
     // 아이템이 비활성 상태일 때, 일정 시간이 지나면 다시 생성
     if (!item->active && (currentTime - lastInactiveTime >= ITEM_RESPAWN_DELAY + itemLastTime)) {
         itemLastTime = 0;
+        // 아이템 활성화
         item->active = true;
+
+        // 아이템 위치는 화면 끝부분을 제외한 중앙 부분
         item->position = (Vector2){ 200 + rand() % 800, 100 + rand() % 600 };
-        //아이템 랜덤 생성
+        // 아이템 타입 랜덤 생성
         int itemIdx = rand() % 3;
 
         switch (itemIdx)
@@ -49,6 +54,7 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
             break;
         }
 
+        // 아이템이 활성화 시작된 시간 저장
         itemActiveTime = currentTime;
     }
 
@@ -65,6 +71,7 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
         // 플레이어가 아이템을 먹었는지 확인
         if (CheckCollisionCircles(player->position, PLAYER_SIZE / 2.0f, item->position, ITEM_RADIUS)) {
 
+            // 아이템을 먹었으면 타입에 따라서 시작 시간 계산, 맞는 효과음 재생
             switch (item->type)
             {
             case STOP_METEOR:
@@ -87,6 +94,7 @@ void UpdateItem(Item* item, Player* player, Sound invincibleSound, Sound getItem
                 break;
             }
 
+            // 아이템 먹은 상태 true, 아이템 자체는 화면에 보이지 않으므로 비활성화
             item->isItem = true;
             item->active = false;
             lastInactiveTime = currentTime;
@@ -111,15 +119,15 @@ void DrawItem(Item* item) {
 
     switch (item->type)
     {
-        //운석 정지 아이템
+        // 운석 정지 아이템은 초록색으로 그리기
     case STOP_METEOR:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, GREEN);
         break;
-        //플레이어 무적 아이템
+        // 플레이어 무적 아이템은 노란색으로 그리기
     case INVINCIBLE_PLAYER:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, YELLOW);
         break;
-        //레이저 건 아이템
+        // 레이저 건 아이템은 주황색으로 그리기
     case LASER_GUN:
         DrawStar(item->position, ITEM_RADIUS, ITEM_RADIUS * 0.4f, GetTime() * 30.0f, ORANGE);
         break;
@@ -144,13 +152,13 @@ void DrawStar(Vector2 center, float outerRadius, float innerRadius, float rotati
         vertices[i].y = center.y + currentRadius * sinf(angle);
     }
 
-    //5개의 바깥쪽 뾰족한 부분 (각 꼭지) 그리기
+    // 5개의 바깥쪽 뾰족한 부분 (각 꼭지) 그리기
     for (int i = 0; i < 5; i++)
     {
         DrawTriangle(vertices[(i * 2 + 1) % 10], vertices[i * 2], vertices[(i * 2 - 1 + 10) % 10], color);
     }
 
-    //중앙의 오각형 채우기
+    // 중앙의 오각형 채우기
     for (int i = 0; i < 5; i++)
     {
         DrawTriangle(center, vertices[(i * 2 + 3) % 10], vertices[(i * 2 + 1) % 10], color);
