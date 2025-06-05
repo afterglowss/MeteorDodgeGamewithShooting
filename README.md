@@ -51,10 +51,14 @@
 
 | 파일명 | 설명 |
 |--------|------|
-| `MeteorDodgeGamewithShooting.exe` | Windows 실행 파일 |
 | `main.c` 외 `.c/.h` | 게임 전체 소스 코드 |
-| `resources/` | 게임 리소스 (사운드 등) |
 | `README.md` | 프로젝트 설명 문서 |
+| `CONTRIBUTING.md` | 기여 방법 문서 |
+| `MeteorDodgeGamewithShooting.sln` | Visual Studio Solution 파일 |
+| `include\` | raylib 헤더 폴더 |
+| `lib\` | raylib 라이브러리 및 링커 폴더 |
+| `build\` | Windows 실행 폴더 |
+| `resources\` | 게임 리소스 폴더 (사운드 등) |
 
 ---
 
